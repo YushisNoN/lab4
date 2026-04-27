@@ -9,6 +9,8 @@ HLT
                00010101 00000000 00000000 00000000
                00100000 00110000 00010000 00000000
 21 20 00 00
+
+
 """
 
 from CPU import CPU
@@ -20,6 +22,6 @@ cpu.instr_mem.write(2, 0x21301000)
 cpu.instr_mem.write(3, 0x01000000)
 
 while not cpu.halt:
-    cpu.execute_step()
+    cpu.step()
 
 print(cpu.regs.R)

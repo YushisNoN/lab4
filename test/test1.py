@@ -13,6 +13,6 @@ cpu.instr_mem.write(2, 0x20201000)  # ADD R2 = R0 + R1
 cpu.instr_mem.write(3, 0x01000000)  # HALT
 
 while not cpu.halt:
-    cpu.execute_step()
+    cpu.step()
 
 print(cpu.regs.R)
