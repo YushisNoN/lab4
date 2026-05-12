@@ -59,7 +59,8 @@ class MicroInstruction:
                  pc_write=0,
                  cond=None,
                  jump=0,
-                 next_addr=None):
+                 next_addr=None,
+                 mem_data=None):
 
         self.src_a = src_a
         self.src_b = src_b
@@ -68,7 +69,7 @@ class MicroInstruction:
         self.reg_write = reg_write
         self.mem_read = mem_read
         self.mem_write = mem_write
-
+        self.mem_data = mem_data
         self.use_imm = use_imm
         self.write_flags = write_flags
 
@@ -156,7 +157,6 @@ class CPU:
         self.micro_mem[base] = MicroInstruction(src_a="rs1", src_b="rs2", alu_op="SUB")
         self.micro_mem[base + 1] = MicroInstruction(jump=1, next_addr=0)
 
-        # В методе set_microcode
         for op_name, op_code in [("AND", 0x40), ("OR", 0x41), ("XOR", 0x42)]:
             base = op_code * 4
             self.micro_mem[base] = MicroInstruction(src_a="rs1", src_b="rs2", alu_op=op_name, reg_write=1)
@@ -201,6 +201,21 @@ class CPU:
         self.micro_mem[base + 1] = MicroInstruction(src_a="r7", use_imm=1, alu_op="ADD", reg_write=1)
         self.micro_mem[base + 2] = MicroInstruction(jump=1, next_addr=0)
 
+        base = 0x72 * 4
+        self.micro_mem[base] = MicroInstruction(src_a="r7",use_imm=1,alu_op="SUB",reg_write=1)
+        self.micro_mem[base + 1] = MicroInstruction(src_a="r7",mem_write=1,mem_data="PC")
+        self.micro_mem[base + 2] = MicroInstruction(pc_write=1,cond=None)
+        self.micro_mem[base + 3] = MicroInstruction(jump=1,next_addr=0)
+
+        base = 0x73 * 4
+        self.micro_mem[base] = MicroInstruction(src_a="r7",mem_read=1)
+        self.micro_mem[base + 1] = MicroInstruction(jump=1,next_addr="RET_SET_PC")
+        self.micro_mem[base + 2] = MicroInstruction(src_a="r7",use_imm=1,alu_op="ADD",reg_write=1)
+        self.micro_mem[base + 3] = MicroInstruction(jump=1,next_addr=0)
+
+        base = 0x80 * 4
+        self.micro_mem[base] = MicroInstruction(jump=1,next_addr="PSTR")
+
     def step(self):
         if not self.halt:
             self.micro_step()
@@ -243,6 +258,21 @@ class CPU:
                 self.halt = True
                 return
 
+            if micro.next_addr == "RET_SET_PC":
+                self.PC = self.buffer_reg
+                self.MP += 1
+                return
+
+            if micro.next_addr == "PSTR":
+                rd = (self.IR >> 20) & 0xF
+                addr = self.regs[rd]
+                length = self.data_mem.read(addr)
+                for i in range(length):
+                    ch = self.data_mem.read(addr + 1 + i)
+                    print(chr(ch), end="")
+                self.MP = 0
+                return
+
             if self.MP // 4 == 0x60:
                 a = self.get_src("rd")
                 b = 1
@@ -278,7 +308,10 @@ class CPU:
 
 
             if micro.mem_write:
-                val = self.get_src("rs1")
+                if micro.mem_data:
+                    val = self.get_src(micro.mem_data)
+                else:
+                    val = self.get_src("rs1")
                 if addr == self.OUT:
                     print(f"OUT: {chr(val & 0xFF)} (hex: {hex(addr)})")
                 elif addr == self.RS:
@@ -311,30 +344,64 @@ class CPU:
         self.tick += 1
 
     def ALU(self, op, a, b):
-        a_32 = a & 0xFFFFFFFF
-        b_32 = b & 0xFFFFFFFF
-        result = 0
-        overflow = 0
-        if op == "ADD":
-            res_full = a_32 + b_32
-            result = res_full & 0xFFFFFFFF
-            a_sign = (a_32 >> 31) & 1
-            b_sign = (b_32 >> 31) & 1
-            r_sign = (result >> 31) & 1
-            overflow = (a_sign == b_sign) and (a_sign != r_sign)
+        a &= 0xFFFFFFFF
+        b &= 0xFFFFFFFF
 
+        def bitwise_add(x, y):
+            while y != 0:
+                carry = x & y
+                x = x ^ y
+                y = (carry << 1) & 0xFFFFFFFF
+            return x
+
+        def bitwise_sub(x, y):
+            not_y = y ^ 0xFFFFFFFF
+            y_inv = bitwise_add(not_y, 1)
+            return bitwise_add(x, y_inv)
+
+        def bitwise_mul(x, y):
+            res = 0
+            while y > 0:
+                if y & 1:
+                    res = bitwise_add(res, x)
+                x = (x << 1) & 0xFFFFFFFF
+                y >>= 1
+            return res
+
+        def bitwise_div(x, y):
+            if y == 0: return 0xFFFFFFFF
+            quotient = 0
+            remainder = 0
+            for i in range(31, -1, -1):
+                remainder = (remainder << 1) | ((x >> i) & 1)
+                if remainder >= y:
+                    remainder = bitwise_sub(remainder, y)
+                    quotient |= (1 << i)
+            return quotient & 0xFFFFFFFF
+
+        result = 0
+        if op == "ADD":
+            result = bitwise_add(a, b)
         elif op == "SUB":
-            res_full = a_32 - b_32
-            result = res_full & 0xFFFFFFFF
-            a_sign = (a_32 >> 31) & 1
-            b_sign = (b_32 >> 31) & 1
-            r_sign = (result >> 31) & 1
-            overflow = (a_sign != b_sign) and (a_sign != r_sign)
+            result = bitwise_sub(a, b)
+        elif op == "MUL":
+            result = bitwise_mul(a, b)
+        elif op == "DIV":
+            result = bitwise_div(a, b)
         elif op == "AND":
-            result = a_32 & b_32
+            result = a & b
         elif op == "OR":
-            result = a_32 | b_32
+            result = a | b
         elif op == "XOR":
-            result = a_32 ^ b_32
-        self.regs.update_flags(result, overflow)
+            result = a ^ b
+
+        self.update_hardware_flags(op, a, b, result)
         return result
+
+    def update_hardware_flags(self, op, a, b, res):
+        self.regs.flags["Z"] = int(res == 0)
+        self.regs.flags["N"] = (res >> 31) & 1
+        if op == "ADD":
+            self.regs.flags["V"] = int(((a ^ res) & (b ^ res)) >> 31) & 1
+        elif op == "SUB":
+            self.regs.flags["V"] = int(((a ^ b) & (a ^ res)) >> 31) & 1

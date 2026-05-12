@@ -31,6 +31,13 @@ def translate(input, output="program.bin"):
         if first_word == ".word":
             memory_map[current_pc] = ("DATA", int(parts[1], 0))
             current_pc += 1
+        elif first_word == ".str":
+            text = line.split('"')[1]
+            memory_map[current_pc] = ("DATA", len(text))
+            current_pc += 1
+            for ch in text:
+                memory_map[current_pc] = ("DATA", ord(ch))
+                current_pc += 1
         elif first_word == ".org":
             current_pc = int(parts[1], 0)
         elif first_word == ".start":
@@ -111,6 +118,12 @@ def translate(input, output="program.bin"):
                     rs1 = int(parts[1][1:])
                 elif mnemonic == "POP":
                     rd = int(parts[1][1:])
+                elif mnemonic == "PSTR":
+                    rd = int(parts[1][1:])
+                elif mnemonic == "CALL":
+                    imm = labels[parts[1]]
+                elif mnemonic == "RET":
+                    pass
                 instruction = (opcode << 24) | (rd << 20) | (rs1 << 16) | (rs2 << 12) | (imm & 0xFFF)
 
         encoded_memory[pc_addr] = instruction
