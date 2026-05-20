@@ -26,6 +26,9 @@ OPCODES = {
     "NEG": 0x02,
     "PUSH": 0x70,
     "POP": 0x71,
+    "CALL": 0x72,
+    "RET": 0x73,
+    "PSTR": 0x74
 }
 
 PORTS = {

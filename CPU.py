@@ -9,7 +9,7 @@ class Register:
 
     def __setitem__(self, key, value):
         self.R[key] = value
-        self.update_flags(value)
+        #self.update_flags(value)
 
     def update_flags(self, value, overflow=0):
         self.flags["Z"] = int(value == 0)
@@ -21,6 +21,8 @@ class Memory:
         self.mem = [0] * size
 
     def read(self, addr):
+        if addr < 0 or addr >= len(self.mem):
+            raise Exception("Memory access violation")
         return self.mem[addr]
 
     def write(self, addr, value):
@@ -43,7 +45,7 @@ class Instruction:
                 f"{'rs1':<8} {self.rs1:<10} {self.rs1:04b}\n"
                 f"{'rs2':<8} {self.rs2:<10} {self.rs2:04b}\n"
                 f"{'imm':<8} {self.imm:<10} {self.imm:012b}\n"
-                f"{'word':<8} {self.word:<10} {self.word:032b}")
+                f"{'word':<8} {self.word:<10} {self.word:032b}\n")
 
 
 class MicroInstruction:
@@ -60,7 +62,8 @@ class MicroInstruction:
                  cond=None,
                  jump=0,
                  next_addr=None,
-                 mem_data=None):
+                 mem_data=None,
+                 mem_addr=None):
 
         self.src_a = src_a
         self.src_b = src_b
@@ -75,6 +78,7 @@ class MicroInstruction:
 
         self.pc_write = pc_write
         self.cond = cond
+        self.mem_addr= mem_addr
 
         self.jump = jump
         self.next_addr = next_addr
@@ -98,10 +102,13 @@ class CPU:
         self.OUT = 254
         self.RS = 253
         self.input_buffer = []
+        self.output_buffer = []
         self.buffer_reg = 0
+        self.ret_buffer = 0
 
         self.halt = False
         self.set_microcode()
+        self.regs[7] = 250
 
     def set_microcode(self):
 
@@ -145,16 +152,15 @@ class CPU:
         self.micro_mem[base + 1] = MicroInstruction(jump=1, next_addr=0)
 
         base = 0x12 * 4
-        self.micro_mem[base] = MicroInstruction(src_a="rs1", use_imm=1, alu_op="ADD")
-        self.micro_mem[base + 1] = MicroInstruction(mem_write=1)
-        self.micro_mem[base + 2] = MicroInstruction(jump=1, next_addr=0)
+        self.micro_mem[base] = MicroInstruction(mem_write=1, mem_addr="imm", mem_data="rs1")
+        self.micro_mem[base + 1] = MicroInstruction(jump=1, next_addr=0)
 
         base = 0x30 * 4
         self.micro_mem[base] = MicroInstruction(src_a="rs1", reg_write=1)
         self.micro_mem[base + 1] = MicroInstruction(jump=1, next_addr=0)
 
         base = 0x31 * 4
-        self.micro_mem[base] = MicroInstruction(src_a="rs1", src_b="rs2", alu_op="SUB")
+        self.micro_mem[base] = MicroInstruction(src_a="rs1", src_b="rs2", alu_op="SUB", reg_write=0, write_flags=1)
         self.micro_mem[base + 1] = MicroInstruction(jump=1, next_addr=0)
 
         for op_name, op_code in [("AND", 0x40), ("OR", 0x41), ("XOR", 0x42)]:
@@ -163,8 +169,7 @@ class CPU:
             self.micro_mem[base + 1] = MicroInstruction(jump=1, next_addr=0)
 
         base = 0x50 * 4
-        self.micro_mem[base] = MicroInstruction(pc_write=1)
-        self.micro_mem[base + 1] = MicroInstruction(jump=1, next_addr=0)
+        self.micro_mem[base] = MicroInstruction(jump=1, next_addr="IMM_JUMP")
 
         base = 0x51 * 4
         self.micro_mem[base] = MicroInstruction(pc_write=1, cond="Z")
@@ -192,33 +197,48 @@ class CPU:
         self.micro_mem[base + 2] = MicroInstruction(jump=1, next_addr=0)
 
         base = 0x70 * 4
-        self.micro_mem[base] = MicroInstruction(src_a="r7", use_imm=1, alu_op="SUB", reg_write=1)
-        self.micro_mem[base + 1] = MicroInstruction(src_a="r7", mem_write=1)
+        self.micro_mem[base] = MicroInstruction(src_a="r7", use_imm=1, alu_op="SUB", reg_write=1, write_flags=0)
+        self.micro_mem[base + 1] = MicroInstruction(mem_write=1, mem_data="rs1", mem_addr="r7")
         self.micro_mem[base + 2] = MicroInstruction(jump=1, next_addr=0)
 
         base = 0x71 * 4
-        self.micro_mem[base] = MicroInstruction(src_a="r7", mem_read=1, reg_write=1)
+        self.micro_mem[base] = MicroInstruction(mem_read=1, reg_write=1, mem_addr="r7", write_flags=0)
         self.micro_mem[base + 1] = MicroInstruction(src_a="r7", use_imm=1, alu_op="ADD", reg_write=1)
         self.micro_mem[base + 2] = MicroInstruction(jump=1, next_addr=0)
 
         base = 0x72 * 4
-        self.micro_mem[base] = MicroInstruction(src_a="r7",use_imm=1,alu_op="SUB",reg_write=1)
-        self.micro_mem[base + 1] = MicroInstruction(src_a="r7",mem_write=1,mem_data="PC")
-        self.micro_mem[base + 2] = MicroInstruction(pc_write=1,cond=None)
-        self.micro_mem[base + 3] = MicroInstruction(jump=1,next_addr=0)
+        self.micro_mem[base] = MicroInstruction(src_a="r7", alu_op="SUB", reg_write=1, use_imm=1)
+        self.micro_mem[base + 1] = MicroInstruction(mem_write=1, mem_addr="r7", mem_data="PC")
+        self.micro_mem[base + 2] = MicroInstruction(jump=1, next_addr="IMM_JUMP")
 
         base = 0x73 * 4
-        self.micro_mem[base] = MicroInstruction(src_a="r7",mem_read=1)
-        self.micro_mem[base + 1] = MicroInstruction(jump=1,next_addr="RET_SET_PC")
-        self.micro_mem[base + 2] = MicroInstruction(src_a="r7",use_imm=1,alu_op="ADD",reg_write=1)
-        self.micro_mem[base + 3] = MicroInstruction(jump=1,next_addr=0)
+        self.micro_mem[base] = MicroInstruction(mem_read=1, mem_addr="r7", reg_write=0)
+        self.micro_mem[base + 1] = MicroInstruction(src_a="r7", alu_op="ADD", use_imm=1, reg_write=1)
+        self.micro_mem[base + 2] = MicroInstruction(jump=1, next_addr="RET_SET_PC")
 
-        base = 0x80 * 4
+        base = 0x74 * 4
         self.micro_mem[base] = MicroInstruction(jump=1,next_addr="PSTR")
 
     def step(self):
         if not self.halt:
             self.micro_step()
+
+    def check_sp(self):
+        sp = self.regs[7]
+        if sp < 0 or sp >= len(self.data_mem.mem):
+            raise Exception(f"Stack overflow: SP={sp}")
+
+    def get_addr(self, name):
+        if name == "r7":
+            addr = self.regs[7]
+            if addr < 0 or addr >= len(self.data_mem.mem):
+                raise Exception(f"Stack overflow: {addr}")
+            return addr
+        if name == "imm":
+            return self.IR & 0xFFF
+        if name == "rd":
+            return self.regs[(self.IR >> 20) & 0xF]
+        return 0
 
     def get_src(self, name):
         if name == "rs1":
@@ -258,18 +278,23 @@ class CPU:
                 self.halt = True
                 return
 
-            if micro.next_addr == "RET_SET_PC":
-                self.PC = self.buffer_reg
-                self.MP += 1
-                return
-
             if micro.next_addr == "PSTR":
                 rd = (self.IR >> 20) & 0xF
                 addr = self.regs[rd]
                 length = self.data_mem.read(addr)
-                for i in range(length):
-                    ch = self.data_mem.read(addr + 1 + i)
-                    print(chr(ch), end="")
+                self.output_buffer.append([length])
+                s = "".join(chr(self.data_mem.read(addr + 1 + i)) for i in range(length))
+                self.output_buffer[-1].append(s)
+                self.MP = 0
+                return
+
+            if micro.next_addr == "IMM_JUMP":
+                self.PC = self.IR & 0xFFF
+                self.MP = 0
+                return
+
+            if micro.next_addr == "RET_SET_PC":
+                self.PC = self.ret_buffer
                 self.MP = 0
                 return
 
@@ -278,15 +303,30 @@ class CPU:
                 b = 1
             else:
                 a = self.get_src(micro.src_a)
-                b = self.IR & 0xFFF if micro.use_imm else self.get_src(micro.src_b)
+                opcode = (self.IR >> 24) & 0xFF
+                if opcode == 0x72 and micro.src_a == "r7" and micro.alu_op in ("ADD", "SUB"):
+                    b = 1
+                elif opcode == 0x73 and micro.src_a == "r7" and micro.alu_op in ("ADD", "SUB"):
+                    b = 1
+                else:
+                    b = self.IR & 0xFFF if micro.use_imm else self.get_src(micro.src_b)
 
             if micro.alu_op:
+                a = self.get_src(micro.src_a)
+
+                if opcode in (0x70, 0x71, 0x72, 0x73) and micro.src_a == "r7" and micro.alu_op in ("ADD", "SUB"):
+                    b = 1
+                else:
+                    b = self.IR & 0xFFF if micro.use_imm else self.get_src(micro.src_b)
                 self.buffer_reg = self.ALU(micro.alu_op, a, b)
+                if micro.write_flags:
+                    self.update_hardware_flags(micro.alu_op, a, b,  self.buffer_reg)
+
             elif micro.src_a is not None and not micro.mem_read:
                 self.buffer_reg = a
 
-            if micro.src_a == "r7":
-                addr = self.regs[7]
+            if micro.mem_addr is not None:
+                addr = self.get_addr(micro.mem_addr)
             else:
                 addr = self.buffer_reg
 
@@ -298,22 +338,33 @@ class CPU:
                 else:
                     self.buffer_reg = self.data_mem.read(addr)
 
-            if micro.reg_write:
-                if micro.alu_op and (micro.src_a == "r7" or ((self.IR >> 20) & 0x0F) == 7):
-                    self.regs[7] = self.buffer_reg
-                else:
-                    rd = (self.IR >> 20) & 0x0F
-                    if rd != 0:
-                        self.regs[rd] = self.buffer_reg
+                if (self.IR >> 24) & 0xFF == 0x73:
+                    self.ret_buffer = self.buffer_reg
 
+            if micro.reg_write:
+                opcode = (self.IR >> 24) & 0xFF
+                rd = (self.IR >> 20) & 0xF
+
+                if micro.alu_op and micro.src_a == "r7" and opcode in (0x70, 0x71, 0x72, 0x73):
+                    self.regs[7] = self.buffer_reg
+                elif rd != 0:
+                    self.regs[rd] = self.buffer_reg
 
             if micro.mem_write:
+                if micro.mem_addr is not None:
+                    addr = self.get_addr(micro.mem_addr)
+                else:
+                    addr = self.buffer_reg
                 if micro.mem_data:
                     val = self.get_src(micro.mem_data)
                 else:
                     val = self.get_src("rs1")
+
+                if addr < 0 or addr >= len(self.data_mem.mem):
+                    raise Exception(f"Memory access violation: {addr}")
+
                 if addr == self.OUT:
-                    print(f"OUT: {chr(val & 0xFF)} (hex: {hex(addr)})")
+                    self.output_buffer.append(val)
                 elif addr == self.RS:
                     pass
                 else:
@@ -394,9 +445,16 @@ class CPU:
             result = a | b
         elif op == "XOR":
             result = a ^ b
+        elif op == "CMP":
+            result = bitwise_sub(a, b)
+            self.regs.flags["Z"] = int(result == 0)
+            self.regs.flags["N"] = (result >> 31) & 1
+            self.regs.flags["V"] = 0
 
-        self.update_hardware_flags(op, a, b, result)
+            return result
+
         return result
+
 
     def update_hardware_flags(self, op, a, b, res):
         self.regs.flags["Z"] = int(res == 0)

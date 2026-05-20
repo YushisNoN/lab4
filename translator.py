@@ -7,6 +7,7 @@ def translate(input, output="program.bin"):
     raw_lines = []
     labels = {}
     memory_map = {}
+    str_map = {}
     current_pc = 0
     start_address = 0
     with open(input, 'r') as f:
@@ -34,6 +35,7 @@ def translate(input, output="program.bin"):
         elif first_word == ".str":
             text = line.split('"')[1]
             memory_map[current_pc] = ("DATA", len(text))
+            str_map[label] = current_pc
             current_pc += 1
             for ch in text:
                 memory_map[current_pc] = ("DATA", ord(ch))
@@ -61,6 +63,9 @@ def translate(input, output="program.bin"):
 
     encoded_memory = {}
     debug_info = []
+
+    SECTION_CODE = 0
+    SECTION_DATA = 1
 
     for pc_addr in sorted(memory_map.keys()):
         line = memory_map[pc_addr]
@@ -92,15 +97,21 @@ def translate(input, output="program.bin"):
                     else:
                         rs1 = int(arg2[1:])
                 elif mnemonic == "LOADI":
+                    if parts[2] in str_map:
+                        imm = int(str(str_map[parts[2]]), 0)
+                    else:
+                        imm = int(parts[2], 0)
                     rd = int(parts[1][1:])
-                    imm = int(parts[2], 0)
+
                 elif mnemonic == "STORE":
                     rs1 = int(parts[1][1:])
                     arg2 = parts[2]
-                    if arg2 in labels:
+                    if arg2 in Opcodes.PORTS:
+                        imm = Opcodes.PORTS[arg2]
+                    elif arg2 in labels:
                         imm = labels[arg2]
                     else:
-                        rd = int(arg2[1:])
+                        rs2 = int(arg2[1:])
                 elif mnemonic in ["ADD", "SUB", "MUL", "DIV"]:
                     rd = int(parts[1][1:])
                     rs1 = int(parts[2][1:])
@@ -110,7 +121,7 @@ def translate(input, output="program.bin"):
                     rs1 = 0
                     rs2 = int(parts[2][1:])
                     opcode = 0x21
-                elif mnemonic in ["ADD", "SUB", "MUL", "DIV", "AND", "OR", "XOR"]:
+                elif mnemonic in ["AND", "OR", "XOR"]:
                     rd = int(parts[1][1:])
                     rs1 = int(parts[2][1:])
                     rs2 = int(parts[3][1:])
@@ -124,6 +135,13 @@ def translate(input, output="program.bin"):
                     imm = labels[parts[1]]
                 elif mnemonic == "RET":
                     pass
+                elif mnemonic in ["MOV"]:
+                    rd = int(parts[1][1:])
+                    rs1 = int(parts[2][1:])
+                elif mnemonic in ["CMP"]:
+                    rs1 = int(parts[1][1:])
+                    rs2 = int(parts[2][1:])
+
                 instruction = (opcode << 24) | (rd << 20) | (rs1 << 16) | (rs2 << 12) | (imm & 0xFFF)
 
         encoded_memory[pc_addr] = instruction
