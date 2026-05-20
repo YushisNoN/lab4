@@ -9,7 +9,6 @@ class Register:
 
     def __setitem__(self, key, value):
         self.R[key] = value
-        #self.update_flags(value)
 
     def update_flags(self, value, overflow=0):
         self.flags["Z"] = int(value == 0)
@@ -219,6 +218,14 @@ class CPU:
         base = 0x74 * 4
         self.micro_mem[base] = MicroInstruction(jump=1,next_addr="PSTR")
 
+        base = 0x75 * 4
+        self.micro_mem[base] = MicroInstruction(mem_read=1,mem_addr="IN",reg_write=1)
+        self.micro_mem[base + 1] = MicroInstruction(jump=1, next_addr=0)
+
+        base = 0x76 * 4
+        self.micro_mem[base] = MicroInstruction(mem_write=1,mem_addr="OUT")
+        self.micro_mem[base + 1] = MicroInstruction(jump=1, next_addr=0)
+
     def step(self):
         if not self.halt:
             self.micro_step()
@@ -234,10 +241,16 @@ class CPU:
             if addr < 0 or addr >= len(self.data_mem.mem):
                 raise Exception(f"Stack overflow: {addr}")
             return addr
+
         if name == "imm":
             return self.IR & 0xFFF
+
         if name == "rd":
             return self.regs[(self.IR >> 20) & 0xF]
+
+        if name == "IN":
+            return self.IN
+
         return 0
 
     def get_src(self, name):
@@ -332,7 +345,10 @@ class CPU:
 
             if micro.mem_read:
                 if addr == self.IN:
-                    self.buffer_reg = ord(self.input_buffer.pop(0)) if self.input_buffer else 0
+                    if self.input_buffer:
+                        self.buffer_reg = self.input_buffer.pop(0)
+                    else:
+                        self.buffer_reg = 0
                 elif addr == self.RS:
                     self.buffer_reg = 1 if self.input_buffer else 0
                 else:
@@ -450,7 +466,6 @@ class CPU:
             self.regs.flags["Z"] = int(result == 0)
             self.regs.flags["N"] = (result >> 31) & 1
             self.regs.flags["V"] = 0
-
             return result
 
         return result

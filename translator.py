@@ -1,5 +1,7 @@
 import sys
 import struct
+
+
 import Opcodes
 
 
@@ -48,7 +50,7 @@ def translate(input, output="program.bin"):
             label = line[:-1]
             labels[label] = current_pc
         else:
-            memory_map[current_pc] = " ".join(parts)
+            memory_map[current_pc] = ("CODE", " ".join(parts))
             current_pc += 1
 
     if 'start_label' in locals():
@@ -71,10 +73,10 @@ def translate(input, output="program.bin"):
         line = memory_map[pc_addr]
         instruction = 0
 
-        if isinstance(line, tuple) and line[0] == "DATA":
+        if line[0] == "DATA":
             instruction = line[1] & 0xFFFFFFFF
-        else:
-            parts = line.replace(",", " ").split()
+        elif line[0] == "CODE":
+            parts = line[1].replace(",", " ").split()
             if not parts: continue
 
             mnemonic = parts[0].upper()
@@ -141,38 +143,49 @@ def translate(input, output="program.bin"):
                 elif mnemonic in ["CMP"]:
                     rs1 = int(parts[1][1:])
                     rs2 = int(parts[2][1:])
-
+                elif mnemonic == "IN":
+                    rd = int(parts[1][1:])
                 instruction = (opcode << 24) | (rd << 20) | (rs1 << 16) | (rs2 << 12) | (imm & 0xFFF)
 
-        encoded_memory[pc_addr] = instruction
+        encoded_memory[pc_addr] = (line[0], instruction)
         debug_info.append(f"{pc_addr:02X} - {instruction:08X} - {line}")
 
+    code_sections = []
+    data_sections = []
     sections = []
     sorted_addresses = sorted(encoded_memory.keys())
 
-    if sorted_addresses:
-        current_section = {
-            'start_addr': sorted_addresses[0],
-            'words': [encoded_memory[sorted_addresses[0]]]
-        }
+    def add_to_section(sections, addr, word):
+        if sections and sections[-1]['start_addr_end'] == addr - 1:
+            sections[-1]['words'].append(word)
+            sections[-1]['start_addr_end'] = addr
+        else:
+            sections.append({
+                'start_addr':   addr,
+                'start_addr_end': addr,
+                'words': [word]
+            })
 
-        for i in range(1, len(sorted_addresses)):
-            prev_addr = sorted_addresses[i - 1]
-            curr_addr = sorted_addresses[i]
+    for addr in sorted_addresses:
+        kind, word =  encoded_memory[addr]
+        if kind == "CODE":
+            add_to_section(code_sections, addr, word)
+        else:
+            add_to_section(data_sections, addr, word)
 
-            if curr_addr == prev_addr + 1:
-                current_section['words'].append(encoded_memory[curr_addr])
-            else:
-                sections.append(current_section)
-                current_section = {
-                    'start_addr': curr_addr,
-                    'words': [encoded_memory[curr_addr]]
-                }
-        sections.append(current_section)
 
     with open(output, 'wb') as f:
         f.write(struct.pack('>I', start_address))
-        for sec in sections:
+        # CODE_SECTION
+        f.write(struct.pack('>I', len(code_sections)))
+        for sec in code_sections:
+            f.write(struct.pack('>I', sec['start_addr']))
+            f.write(struct.pack('>I', len(sec['words'])))
+            for word in sec['words']:
+                f.write(struct.pack('>I', word))
+        # DATA_SECTION
+        f.write(struct.pack('>I', len(data_sections)))
+        for sec in data_sections:
             f.write(struct.pack('>I', sec['start_addr']))
             f.write(struct.pack('>I', len(sec['words'])))
             for word in sec['words']:
