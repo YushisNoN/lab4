@@ -22,6 +22,7 @@ def load_program(cpu, binary_filename):
                 for j in range(count):
                     word = struct.unpack('>I', f.read(4))[0]
                     cpu.instr_mem.write(target_addr + j, word)
+
             num_data_sections = struct.unpack('>I', f.read(4))[0]
             print(f"Data sections: {num_data_sections}")
             for i in range(num_data_sections):
@@ -36,20 +37,29 @@ def load_program(cpu, binary_filename):
     except Exception as e:
         print(f"Load error: {e}")
 
-def dump_stack(self, depth=20):
-    sp = self.regs[7]
-    print(f"\nSTACK (top at SP={sp})")
+def trace_log(cpu):
+    opcode = (cpu.IR >> 24) & 0xFF
+    f = open("log.txt", "a+")
+    regs = " ".join([f"R{i}={cpu.regs[i]}" for i in range(8)])
 
-    for i in range(depth):
-        addr = sp + i
-        if addr >= len(self.data_mem.mem):
-            break
-        print(f"SP+{i:02} [{addr:04}] = {self.data_mem.read(addr)}")
+    f.write(
+        f"T={cpu.tick} | "
+        f"PC={cpu.PC} | "
+        f"MP={cpu.MP} | "
+        f"IR={cpu.IR:08X} | "
+        f"OP={opcode:02X} | "
+        f"{regs} | "
+        f"SP={cpu.SP} | "
+        f"Z={cpu.regs.flags['Z']} "
+        f"N={cpu.regs.flags['N']} "
+        f"C={cpu.regs.flags['C']}\n"
+    )
+    f.close()
 
-def debug(cpu):
-    sp = cpu.regs[7]
+def debug(cpu, isMemory=False, isStack=False):
+    sp = cpu.regs[-1]
     regs_str = " | ".join(
-        [f"R{i}: {cpu.regs[i]:<4} | " for i in range(7)]
+        [f"R{i}: {cpu.regs[i]:<4} | " for i in range(len(cpu.regs.R))]
     )
 
     print(
@@ -57,8 +67,19 @@ def debug(cpu):
         f"IR: {cpu.IR:08X} | "
         f"{regs_str} | "
         f"FLAGS: {cpu.regs.flags} | "
-        f"STACK: {cpu.data_mem.mem[sp:sp + 5]}"
+        f"SP: {cpu.SP:4} | "
     )
+
+    if(isStack):
+        print(
+            f"STACK: {cpu.data_mem.mem[cpu.SP-5:]}"
+        )
+
+    if cfg.get("memory") is not None and isMemory:
+        print(
+            f"Memory[{cfg.get("memory")["start"]:4}:{cfg.get("memory")["end"]:4}]: ",
+            cpu.data_mem.mem[cfg.get("memory")["start"]: cfg.get("memory")["end"]]
+        )
 
 def load_config(path):
     with open(path, "r", encoding="utf-8") as f:
@@ -79,6 +100,8 @@ def apply_config(cpu, cfg):
     for k, v in cfg.get("instr_image", {}).items():
         cpu.instr_mem.write(int(k), v)
 
+
+
 if __name__ == "__main__":
     if len(sys.argv) < 3:
         print("Usage: python main.py program.bin input.txt [--debug to see a debug info]")
@@ -87,7 +110,9 @@ if __name__ == "__main__":
     bin_file = sys.argv[1]
     data_file = sys.argv[2]
     isDebug = "--debug" in sys.argv
-
+    isMemoryDump = "--m" in sys.argv
+    isStack = "--s" in sys.argv
+    isTrace = "--t" in sys.argv
     cfg = load_config(data_file)
 
     cpu = CPU(
@@ -102,12 +127,25 @@ if __name__ == "__main__":
             cpu.step()
 
             if isDebug:
-                debug(cpu)
+                debug(cpu, isMemoryDump, isStack)
+            if isTrace:
+                trace_log(cpu)
 
         print("Simulation finished (HALT).")
         print("PROGRAM OUTPUT:")
         for idx, value in enumerate(cpu.output_buffer):
             print(f"{idx:4} | {value}")
+        print("\nPROGRAM OUTPUT (ascii):")
+        try:
+            output = ""
+            for x in cpu.output_buffer:
+                if isinstance(x, str):
+                    print(x)
+                else:
 
+                    output += chr(x)
+            print("".join(output))
+        except:
+            print("<not ascii>")
     except Exception as e:
         print(f"Runtime error: {e}")

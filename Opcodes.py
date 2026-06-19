@@ -22,6 +22,7 @@ OPCODES = {
     "JG": 0x53,
     "JL": 0x54,
     "JGE": 0x55,
+    "JC": 0x56,
     "LOOP": 0x60,
     "NEG": 0x02,
     "PUSH": 0x70,
