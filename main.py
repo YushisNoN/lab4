@@ -1,7 +1,8 @@
+import json
 import struct
 import sys
-from CPU import CPU, Memory
-import json
+
+from CPU import CPU
 
 
 def load_program(cpu, binary_filename):
@@ -31,7 +32,7 @@ def load_program(cpu, binary_filename):
                     word = struct.unpack(">I", f.read(4))[0]
                     cpu.data_mem.write(target_addr + j, word)
 
-        print(f"Successfully loaded program.")
+        print("Successfully loaded program.")
 
     except Exception as e:
         print(f"Load error: {e}")
@@ -58,10 +59,7 @@ def trace_log(cpu):
 
 
 def debug(cpu, isMemory=False, isStack=False):
-    sp = cpu.regs[-1]
-    regs_str = " | ".join(
-        [f"R{i}: {cpu.regs[i]:<4} | " for i in range(len(cpu.regs.R))]
-    )
+    regs_str = " | ".join([f"R{i}: {cpu.regs[i]:<4} | " for i in range(len(cpu.regs.R))])
 
     print(
         f"TICK: {cpu.tick:4} | PC: {cpu.PC:4} | MP: {cpu.MP:4} | "
@@ -82,7 +80,7 @@ def debug(cpu, isMemory=False, isStack=False):
 
 
 def load_config(path):
-    with open(path, "r", encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         return json.load(f)
 
 
@@ -104,9 +102,7 @@ def apply_config(cpu, cfg):
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
-        print(
-            "Usage: python main.py program.bin input.txt [--debug to see a debug info]"
-        )
+        print("Usage: python main.py program.bin input.txt [--debug to see a debug info]")
         exit(1)
 
     bin_file = sys.argv[1]
@@ -146,7 +142,7 @@ if __name__ == "__main__":
                 else:
                     output += chr(x)
             print("".join(output))
-        except:
+        except UnicodeEncodeError:
             print("<not ascii>")
     except Exception as e:
         print(f"Runtime error: {e}")

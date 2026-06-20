@@ -1,6 +1,5 @@
-import sys
 import struct
-
+import sys
 
 import Opcodes
 
@@ -18,7 +17,7 @@ def translate(input, output="program.bin"):
             return labels[x]
         return int(x, 0)
 
-    with open(input, "r") as f:
+    with open(input) as f:
         for line in f.readlines():
             raw_lines.append(line.split(";")[0].strip())
         lines = [li for li in raw_lines if li]
@@ -181,11 +180,7 @@ def translate(input, output="program.bin"):
                         rs1 = int(parts[2][1:])
                         imm = parse_value(parts[3])
                 instruction = (
-                    (opcode << 24)
-                    | (rd << 20)
-                    | (rs1 << 16)
-                    | (rs2 << 12)
-                    | (imm & 0xFFF)
+                    (opcode << 24) | (rd << 20) | (rs1 << 16) | (rs2 << 12) | (imm & 0xFFF)
                 )
 
         encoded_memory[pc_addr] = (line[0], instruction)
@@ -201,9 +196,7 @@ def translate(input, output="program.bin"):
             sections[-1]["words"].append(word)
             sections[-1]["start_addr_end"] = addr
         else:
-            sections.append(
-                {"start_addr": addr, "start_addr_end": addr, "words": [word]}
-            )
+            sections.append({"start_addr": addr, "start_addr_end": addr, "words": [word]})
 
     for addr in sorted_addresses:
         kind, word = encoded_memory[addr]

@@ -1,5 +1,5 @@
 from CPU import CPU
-from main import load_program, load_config, apply_config
+from main import apply_config, load_config, load_program
 
 
 def test_cat():

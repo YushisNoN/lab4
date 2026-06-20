@@ -140,9 +140,7 @@ class CPU:
         self.micro_mem[0x01 * 4] = MicroInstruction(jump=1, next_addr="HALT")
 
         base = 0x02 * 4
-        self.micro_mem[base] = MicroInstruction(
-            src_a="rs1", src_b="rs2", alu_op="SUB", reg_write=1
-        )
+        self.micro_mem[base] = MicroInstruction(src_a="rs1", src_b="rs2", alu_op="SUB", reg_write=1)
         self.micro_mem[base + 1] = MicroInstruction(jump=1, next_addr=0)
 
         base = 0x20 * 4
@@ -239,17 +237,13 @@ class CPU:
         self.micro_mem[base + 1] = MicroInstruction(jump=1, next_addr=0)
 
         base = 0x60 * 4
-        self.micro_mem[base] = MicroInstruction(
-            src_a="rd", use_imm=1, alu_op="SUB", reg_write=1
-        )
+        self.micro_mem[base] = MicroInstruction(src_a="rd", use_imm=1, alu_op="SUB", reg_write=1)
         self.micro_mem[base + 1] = MicroInstruction(pc_write=1, cond="NZ")
         self.micro_mem[base + 2] = MicroInstruction(jump=1, next_addr=0)
 
         base = 0x70 * 4
         self.micro_mem[base] = MicroInstruction(sp_dec=1)
-        self.micro_mem[base + 1] = MicroInstruction(
-            mem_write=1, mem_addr="SP", mem_data="PC"
-        )
+        self.micro_mem[base + 1] = MicroInstruction(mem_write=1, mem_addr="SP", mem_data="PC")
         self.micro_mem[base + 2] = MicroInstruction(jump=1, next_addr=0)
 
         base = 0x71 * 4
@@ -258,15 +252,11 @@ class CPU:
         self.micro_mem[base + 2] = MicroInstruction(jump=1, next_addr=0)
 
         base = 0x72 * 4
-        self.micro_mem[base] = MicroInstruction(
-            mem_write=1, mem_addr="SP", mem_data="PC", sp_dec=1
-        )
+        self.micro_mem[base] = MicroInstruction(mem_write=1, mem_addr="SP", mem_data="PC", sp_dec=1)
         self.micro_mem[base + 1] = MicroInstruction(jump=1, next_addr="IMM_JUMP")
 
         base = 0x73 * 4
-        self.micro_mem[base] = MicroInstruction(
-            mem_read=1, mem_addr="SP", reg_write=0, sp_inc=1
-        )
+        self.micro_mem[base] = MicroInstruction(mem_read=1, mem_addr="SP", reg_write=0, sp_inc=1)
         self.micro_mem[base + 1] = MicroInstruction(jump=1, next_addr="RET_PC")
 
         base = 0x74 * 4
@@ -375,24 +365,12 @@ class CPU:
             else:
                 a = self.get_src(micro.src_a)
                 opcode = (self.micro_IR >> 24) & 0xFF
-                if (
-                    opcode == 0x72
-                    and micro.src_a == "r7"
-                    and micro.alu_op in ("ADD", "SUB")
-                ):
+                if opcode == 0x72 and micro.src_a == "r7" and micro.alu_op in ("ADD", "SUB"):
                     b = 1
-                elif (
-                    opcode == 0x73
-                    and micro.src_a == "r7"
-                    and micro.alu_op in ("ADD", "SUB")
-                ):
+                elif opcode == 0x73 and micro.src_a == "r7" and micro.alu_op in ("ADD", "SUB"):
                     b = 1
                 else:
-                    b = (
-                        self.micro_IR & 0xFFF
-                        if micro.use_imm
-                        else self.get_src(micro.src_b)
-                    )
+                    b = self.micro_IR & 0xFFF if micro.use_imm else self.get_src(micro.src_b)
 
             if micro.alu_op:
                 a = self.get_src(micro.src_a)
@@ -404,11 +382,7 @@ class CPU:
                 ):
                     b = 1
                 else:
-                    b = (
-                        self.micro_IR & 0xFFF
-                        if micro.use_imm
-                        else self.get_src(micro.src_b)
-                    )
+                    b = self.micro_IR & 0xFFF if micro.use_imm else self.get_src(micro.src_b)
                 self.buffer_reg = self.ALU(micro.alu_op, a, b)
 
                 if micro.write_flags:
@@ -526,6 +500,7 @@ class CPU:
         a &= 0xFFFFFFFF
         b &= 0xFFFFFFFF
         carry = 0
+
         def bitwise_add(x, y):
             carry_out = 0
             while y != 0:
