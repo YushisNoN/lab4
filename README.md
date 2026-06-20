@@ -2,7 +2,8 @@
 ---
 **ФИО:** Никитенко Матвей Олегович
 **Группа:** Р3214
-**Вариант:** `asm | risc | harv | mc | tick | binary | stream | mem | pstr | prob1 | - `
+**Вариант:** 
+`asm | risc | harv | mc | tick | binary | stream | mem | pstr | prob1 | - `
 
 ---
 ## Оглавление
