@@ -1,0 +1,11 @@
+{
+  "data_memory_size": 32000,
+  "instr_memory_size": 32000,
+  "entry_point": 100,
+  "input": [],
+  "data_image": {
+    "0": 0,
+    "254": 0
+  },  
+  "instr_image": {}
+}

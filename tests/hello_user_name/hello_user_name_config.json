@@ -1,0 +1,15 @@
+{
+  "data_memory_size": 32000,
+  "instr_memory_size": 32000,
+  "entry_point": 0,
+  "input": "Matvei\n",
+  "data_image": {
+    "0": 0,
+    "254": 0
+  },
+  "instr_image": {},
+  "memory": {
+    "start": 10,
+    "end": 50
+  }
+}

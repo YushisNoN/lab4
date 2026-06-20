@@ -1,0 +1,6 @@
+main:
+	LOADI R1, 100
+	PUSH R1
+	LOADI R1, 0
+	POP R1
+	HALT
