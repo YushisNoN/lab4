@@ -1,4 +1,3 @@
-
 OPCODES = {
     "HALT": 0x01,
     "NOP": 0x00,
@@ -34,8 +33,4 @@ OPCODES = {
     "OUT": 0x76,
 }
 
-PORTS = {
-    "RS": 253,
-    "OUT": 254,
-    "IN": 255
-}
+PORTS = {"RS": 253, "OUT": 254, "IN": 255}

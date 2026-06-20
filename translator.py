@@ -5,7 +5,6 @@ import struct
 import Opcodes
 
 
-
 def translate(input, output="program.bin"):
     raw_lines = []
     labels = {}
@@ -19,7 +18,7 @@ def translate(input, output="program.bin"):
             return labels[x]
         return int(x, 0)
 
-    with open(input, 'r') as f:
+    with open(input, "r") as f:
         for line in f.readlines():
             raw_lines.append(line.split(";")[0].strip())
         lines = [li for li in raw_lines if li]
@@ -48,13 +47,13 @@ def translate(input, output="program.bin"):
             if ":" in parts[0]:
                 labels[parts[0].replace(":", "")] = str_addr
 
-            memory_map[current_pc] = ("DATA", len(text)-1)
+            memory_map[current_pc] = ("DATA", len(text) - 1)
             current_pc += 1
 
             for ch in range(len(text)):
-                if text[ch] != '\\':
+                if text[ch] != "\\":
                     memory_map[current_pc] = ("DATA", ord(text[ch]))
-                elif ch+1 < len(text) and text[ch] == '\\' and text[ch+1] == 'n':
+                elif ch + 1 < len(text) and text[ch] == "\\" and text[ch + 1] == "n":
                     memory_map[current_pc] = ("DATA", 10)
 
                 current_pc += 1
@@ -70,7 +69,7 @@ def translate(input, output="program.bin"):
             memory_map[current_pc] = ("CODE", " ".join(parts))
             current_pc += 1
 
-    if 'start_label' in locals():
+    if "start_label" in locals():
         if start_label in labels:
             start_address = labels[start_label]
         else:
@@ -94,7 +93,8 @@ def translate(input, output="program.bin"):
             instruction = line[1] & 0xFFFFFFFF
         elif line[0] == "CODE":
             parts = line[1].replace(",", " ").split()
-            if not parts: continue
+            if not parts:
+                continue
 
             mnemonic = parts[0].upper()
             if mnemonic == ".WORD":
@@ -180,7 +180,13 @@ def translate(input, output="program.bin"):
                     else:
                         rs1 = int(parts[2][1:])
                         imm = parse_value(parts[3])
-                instruction = (opcode << 24) | (rd << 20) | (rs1 << 16) | (rs2 << 12) | (imm & 0xFFF)
+                instruction = (
+                    (opcode << 24)
+                    | (rd << 20)
+                    | (rs1 << 16)
+                    | (rs2 << 12)
+                    | (imm & 0xFFF)
+                )
 
         encoded_memory[pc_addr] = (line[0], instruction)
         debug_info.append(f"{pc_addr:02X} - {instruction:08X} - {line}")
@@ -191,45 +197,43 @@ def translate(input, output="program.bin"):
     sorted_addresses = sorted(encoded_memory.keys())
 
     def add_to_section(sections, addr, word):
-        if sections and sections[-1]['start_addr_end'] == addr - 1:
-            sections[-1]['words'].append(word)
-            sections[-1]['start_addr_end'] = addr
+        if sections and sections[-1]["start_addr_end"] == addr - 1:
+            sections[-1]["words"].append(word)
+            sections[-1]["start_addr_end"] = addr
         else:
-            sections.append({
-                'start_addr':   addr,
-                'start_addr_end': addr,
-                'words': [word]
-            })
+            sections.append(
+                {"start_addr": addr, "start_addr_end": addr, "words": [word]}
+            )
 
     for addr in sorted_addresses:
-        kind, word =  encoded_memory[addr]
+        kind, word = encoded_memory[addr]
         if kind == "CODE":
             add_to_section(code_sections, addr, word)
         else:
             add_to_section(data_sections, addr, word)
 
-
-    with open(output, 'wb') as f:
-        f.write(struct.pack('>I', start_address))
+    with open(output, "wb") as f:
+        f.write(struct.pack(">I", start_address))
         # CODE_SECTION
-        f.write(struct.pack('>I', len(code_sections)))
+        f.write(struct.pack(">I", len(code_sections)))
         for sec in code_sections:
-            f.write(struct.pack('>I', sec['start_addr']))
-            f.write(struct.pack('>I', len(sec['words'])))
-            for word in sec['words']:
-                f.write(struct.pack('>I', word))
+            f.write(struct.pack(">I", sec["start_addr"]))
+            f.write(struct.pack(">I", len(sec["words"])))
+            for word in sec["words"]:
+                f.write(struct.pack(">I", word))
         # DATA_SECTION
-        f.write(struct.pack('>I', len(data_sections)))
+        f.write(struct.pack(">I", len(data_sections)))
         for sec in data_sections:
-            f.write(struct.pack('>I', sec['start_addr']))
-            f.write(struct.pack('>I', len(sec['words'])))
-            for word in sec['words']:
-                f.write(struct.pack('>I', word))
+            f.write(struct.pack(">I", sec["start_addr"]))
+            f.write(struct.pack(">I", len(sec["words"])))
+            for word in sec["words"]:
+                f.write(struct.pack(">I", word))
 
-    with open(output + "_deg.txt", 'w') as f:
+    with open(output + "_deg.txt", "w") as f:
         f.write(f"ENTRY POINT: {start_address:02X}\n")
         for entry in debug_info:
             f.write(entry + "\n")
+
 
 if __name__ == "__main__":
     if len(sys.argv) == 2:

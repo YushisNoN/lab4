@@ -4,38 +4,38 @@ from CPU import CPU, Memory
 import json
 
 
-
 def load_program(cpu, binary_filename):
     try:
-        with open(binary_filename, 'rb') as f:
+        with open(binary_filename, "rb") as f:
             header = f.read(4)
             if not header:
                 return
-            cpu.PC = struct.unpack('>I', header)[0]
+            cpu.PC = struct.unpack(">I", header)[0]
             print(f"Entry point (PC) set to: {cpu.PC}")
 
-            num_code_sections = struct.unpack('>I', f.read(4))[0]
+            num_code_sections = struct.unpack(">I", f.read(4))[0]
             print(f"Code sections: {num_code_sections}")
             for i in range(num_code_sections):
-                target_addr, count = struct.unpack('>II', f.read(8))
+                target_addr, count = struct.unpack(">II", f.read(8))
                 print(f"[CODE] section {i}: addr={target_addr}, words={count}")
                 for j in range(count):
-                    word = struct.unpack('>I', f.read(4))[0]
+                    word = struct.unpack(">I", f.read(4))[0]
                     cpu.instr_mem.write(target_addr + j, word)
 
-            num_data_sections = struct.unpack('>I', f.read(4))[0]
+            num_data_sections = struct.unpack(">I", f.read(4))[0]
             print(f"Data sections: {num_data_sections}")
             for i in range(num_data_sections):
-                target_addr, count = struct.unpack('>II', f.read(8))
+                target_addr, count = struct.unpack(">II", f.read(8))
                 print(f"[DATA] section {i}: addr={target_addr}, words={count}")
                 for j in range(count):
-                    word = struct.unpack('>I', f.read(4))[0]
+                    word = struct.unpack(">I", f.read(4))[0]
                     cpu.data_mem.write(target_addr + j, word)
 
         print(f"Successfully loaded program.")
 
     except Exception as e:
         print(f"Load error: {e}")
+
 
 def trace_log(cpu):
     opcode = (cpu.IR >> 24) & 0xFF
@@ -56,6 +56,7 @@ def trace_log(cpu):
     )
     f.close()
 
+
 def debug(cpu, isMemory=False, isStack=False):
     sp = cpu.regs[-1]
     regs_str = " | ".join(
@@ -70,20 +71,20 @@ def debug(cpu, isMemory=False, isStack=False):
         f"SP: {cpu.SP:4} | "
     )
 
-    if(isStack):
-        print(
-            f"STACK: {cpu.data_mem.mem[cpu.SP-5:]}"
-        )
+    if isStack:
+        print(f"STACK: {cpu.data_mem.mem[cpu.SP - 5 :]}")
 
     if cfg.get("memory") is not None and isMemory:
         print(
-            f"Memory[{cfg.get("memory")["start"]:4}:{cfg.get("memory")["end"]:4}]: ",
-            cpu.data_mem.mem[cfg.get("memory")["start"]: cfg.get("memory")["end"]]
+            f"Memory[{cfg.get('memory')['start']:4}:{cfg.get('memory')['end']:4}]: ",
+            cpu.data_mem.mem[cfg.get("memory")["start"] : cfg.get("memory")["end"]],
         )
+
 
 def load_config(path):
     with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
+
 
 def apply_config(cpu, cfg):
     cpu.PC = cfg.get("entry_point", 0)
@@ -101,10 +102,11 @@ def apply_config(cpu, cfg):
         cpu.instr_mem.write(int(k), v)
 
 
-
 if __name__ == "__main__":
     if len(sys.argv) < 3:
-        print("Usage: python main.py program.bin input.txt [--debug to see a debug info]")
+        print(
+            "Usage: python main.py program.bin input.txt [--debug to see a debug info]"
+        )
         exit(1)
 
     bin_file = sys.argv[1]
@@ -117,7 +119,7 @@ if __name__ == "__main__":
 
     cpu = CPU(
         instr_mem_size=cfg.get("instr_memory_size", 256),
-        data_mem_size=cfg.get("data_memory_size", 256)
+        data_mem_size=cfg.get("data_memory_size", 256),
     )
     apply_config(cpu, cfg)
     load_program(cpu, bin_file)
@@ -142,7 +144,6 @@ if __name__ == "__main__":
                 if isinstance(x, str):
                     print(x)
                 else:
-
                     output += chr(x)
             print("".join(output))
         except:
