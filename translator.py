@@ -1,7 +1,6 @@
 import struct
 import sys
 from typing import Any
-from typing import BinaryIO
 
 import Opcodes
 
@@ -86,7 +85,7 @@ def translate(input_path: str, output: str="program.bin") -> None:
                     f"Macro {macro_name}: expected "
                     f"{len(macro['params'])} args, got {len(args)}"
                 )
-            mapping = dict(zip(macro["params"], args))
+            mapping = dict(zip(macro["params"], args, strict=True))
             for body_line in macro["body"]:
                 expanded = body_line
                 tokens = body_line.replace(",", " ").split()
