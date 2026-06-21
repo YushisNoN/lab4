@@ -327,7 +327,6 @@ class CPU:
         imm = word & 0xFFF
 
         hexcode = f"{word:08X}"
-        mnem = self.opcode_map.get(opcode, f"op_{opcode:02X}")
         asm = self.disassemble(word)
 
         comment = self.build_comment(opcode, rd, rs1, rs2, imm)

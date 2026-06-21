@@ -1,6 +1,6 @@
 import struct
 import sys
-from typing import Any
+from typing import Any, BinaryIO
 
 import Opcodes
 

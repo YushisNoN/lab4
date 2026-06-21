@@ -4,7 +4,6 @@ import sys
 from typing import Any
 
 from CPU import CPU
-from Opcodes import OPCODES
 
 
 def load_program(cpu: CPU, binary_filename: str) -> None:
