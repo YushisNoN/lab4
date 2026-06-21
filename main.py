@@ -102,7 +102,6 @@ def apply_config(cpu: CPU, cfg: dict[str, Any]) -> None:
         cpu.instr_mem.write(int(k), v)
 
 
-
 if __name__ == "__main__":
     if len(sys.argv) < 3:
         print("Usage: python main.py program.bin input.txt [--debug to see a debug info]")
