@@ -5,7 +5,7 @@ from typing import Any
 import Opcodes
 
 
-def translate(input_path: str, output: str="program.bin") -> None:
+def translate(input_path: str, output: str = "program.bin") -> None:
     raw_lines = []
     labels: dict[str, int] = {}
     memory_map: dict[int, tuple[str, str | int]] = {}
@@ -59,10 +59,7 @@ def translate(input_path: str, output: str="program.bin") -> None:
                     break
                 body.append(inner)
                 i += 1
-            macros[name] = {
-                "params": params,
-                "body": body
-            }
+            macros[name] = {"params": params, "body": body}
         else:
             processed_lines.append(line)
         i += 1
@@ -82,8 +79,7 @@ def translate(input_path: str, output: str="program.bin") -> None:
             args = parts[1:]
             if len(args) != len(macro["params"]):
                 raise ValueError(
-                    f"Macro {macro_name}: expected "
-                    f"{len(macro['params'])} args, got {len(args)}"
+                    f"Macro {macro_name}: expected {len(macro['params'])} args, got {len(args)}"
                 )
             mapping = dict(zip(macro["params"], args, strict=True))
             for body_line in macro["body"]:
@@ -99,8 +95,6 @@ def translate(input_path: str, output: str="program.bin") -> None:
 
     processed_lines = []
     condition_stack = []
-
-
 
     for line in lines:
         parts = line.replace(",", " ").split()
@@ -337,7 +331,7 @@ def translate(input_path: str, output: str="program.bin") -> None:
         else:
             add_to_section(data_sections, addr, word)
 
-    with open(output, "wb") as f: # type: BinaryIO
+    with open(output, "wb") as f:  # type: BinaryIO
         f.write(struct.pack(">I", start_address))
         # CODE_SECTION
         f.write(struct.pack(">I", len(code_sections)))

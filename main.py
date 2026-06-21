@@ -59,7 +59,7 @@ def trace_log(cpu: CPU) -> None:
     f.close()
 
 
-def debug(cpu: CPU, isMemory: bool=False, isStack: bool=False) -> None:
+def debug(cpu: CPU, isMemory: bool = False, isStack: bool = False) -> None:
     regs_str = " | ".join([f"R{i}: {cpu.regs[i]:<4} | " for i in range(len(cpu.regs.R))])
 
     print(
