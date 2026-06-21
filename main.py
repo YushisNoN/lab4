@@ -1,11 +1,12 @@
 import json
 import struct
 import sys
+from typing import Any
 
 from CPU import CPU
 
 
-def load_program(cpu, binary_filename):
+def load_program(cpu: CPU, binary_filename: str) -> None:
     try:
         with open(binary_filename, "rb") as f:
             header = f.read(4)
@@ -38,7 +39,7 @@ def load_program(cpu, binary_filename):
         print(f"Load error: {e}")
 
 
-def trace_log(cpu):
+def trace_log(cpu: CPU) -> None:
     opcode = (cpu.IR >> 24) & 0xFF
     f = open("log.txt", "a+")
     regs = " ".join([f"R{i}={cpu.regs[i]}" for i in range(8)])
@@ -58,7 +59,7 @@ def trace_log(cpu):
     f.close()
 
 
-def debug(cpu, isMemory=False, isStack=False):
+def debug(cpu: CPU, isMemory: bool=False, isStack: bool=False) -> None:
     regs_str = " | ".join([f"R{i}: {cpu.regs[i]:<4} | " for i in range(len(cpu.regs.R))])
 
     print(
@@ -79,12 +80,12 @@ def debug(cpu, isMemory=False, isStack=False):
         )
 
 
-def load_config(path):
+def load_config(path: str) -> dict[str, Any]:
     with open(path, encoding="utf-8") as f:
         return json.load(f)
 
 
-def apply_config(cpu, cfg):
+def apply_config(cpu: CPU, cfg: dict[str, Any]) -> None:
     cpu.PC = cfg.get("entry_point", 0)
 
     inp = cfg.get("input", [])
