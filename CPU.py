@@ -1,3 +1,8 @@
+from collections import deque
+
+from Opcodes import OPCODES
+
+
 class Register:
     def __init__(self, size=8):
         self.R = [0] * size
@@ -135,6 +140,12 @@ class CPU:
         self.halt = False
         self.set_microcode()
 
+        self.trace_count = 0
+        self.trace_limit = 500
+        self.trace_buffer = deque(maxlen=500)
+        self.trace_file = open("trace.txt", "w", encoding="utf-8")
+        self.opcode_map = {v: k for k, v in OPCODES.items()}
+
     def set_microcode(self):
 
         self.micro_mem[0x01 * 4] = MicroInstruction(jump=1, next_addr="HALT")
@@ -270,6 +281,109 @@ class CPU:
         self.micro_mem[base] = MicroInstruction(mem_write=1, mem_addr="OUT")
         self.micro_mem[base + 1] = MicroInstruction(jump=1, next_addr=0)
 
+    def disassemble(self, word: int) -> str:
+        opcode = (word >> 24) & 0xFF
+        rd = (word >> 20) & 0xF
+        rs1 = (word >> 16) & 0xF
+        rs2 = (word >> 12) & 0xF
+        imm = word & 0xFFF
+
+        mnem = self.opcode_map.get(opcode, f"op_{opcode:02X}")
+
+        if mnem in ["ADD", "SUB", "MUL", "DIV", "AND", "OR", "XOR"]:
+            return f"{mnem.lower()} r{rd}, r{rs1}, r{rs2}"
+
+        if mnem in ["ADDI", "SUBI", "LOAD"]:
+            return f"{mnem.lower()} r{rd}, r{rs1}, #{imm}"
+
+        if mnem == "LOADI":
+            return f"loadi r{rd}, #{imm}"
+
+        if mnem == "STORE":
+            return f"store r{rs1}, [r{rs2}+{imm}]"
+
+        if mnem in ["JMP", "JZ", "JNZ", "JG", "JL", "JGE"]:
+            return f"{mnem.lower()} {imm}"
+
+        if mnem == "CMP":
+            return f"cmp r{rs1}, r{rs2}"
+
+        if mnem == "MOV":
+            return f"mov r{rd}, r{rs1}"
+
+        if mnem == "IN":
+            return f"in r{rd}"
+
+        if mnem == "RET":
+            return "ret"
+
+        return f"{mnem} {word:08X}"
+
+    def trace_instruction(self, addr: int, word: int):
+        opcode = (word >> 24) & 0xFF
+        rd = (word >> 20) & 0xF
+        rs1 = (word >> 16) & 0xF
+        rs2 = (word >> 12) & 0xF
+        imm = word & 0xFFF
+
+        hexcode = f"{word:08X}"
+        mnem = self.opcode_map.get(opcode, f"op_{opcode:02X}")
+        asm = self.disassemble(word)
+
+        comment = self.build_comment(opcode, rd, rs1, rs2, imm)
+        self.trace_buffer.append(f"{addr} - {hexcode} - {asm} {comment}")
+
+    def build_comment(self, opcode, rd, rs1, rs2, imm):
+        op = self.opcode_map.get(opcode, "")
+
+        if op in ["ADD"]:
+            return f"<- r{rs1} + r{rs2}"
+        if op in ["SUB"]:
+            return f"<- r{rs1} - r{rs2}"
+        if op in ["MUL"]:
+            return f"<- r{rs1} * r{rs2}"
+        if op in ["DIV"]:
+            return f"<- r{rs1} / r{rs2}"
+
+        if op in ["ADDI"]:
+            return f"<- r{rs1} + #{imm}"
+        if op in ["SUBI"]:
+            return f"<- r{rs1} - #{imm}"
+
+        if op in ["LOAD"]:
+            return f"<- MEM[r{rs1}+{imm}]"
+        if op in ["STORE"]:
+            return f"-> MEM[r{rs2}+{imm}]"
+
+        if op in ["MOV"]:
+            return f"<- r{rs1}"
+        if op in ["CMP"]:
+            return f"compare r{rs1}, r{rs2}"
+
+        if op in ["JMP"]:
+            return f"jump {imm}"
+        if op in ["JZ", "JNZ", "JG", "JL", "JGE"]:
+            return f"jump cond {imm}"
+
+        if op in ["PUSH"]:
+            return f"push r{rs1}"
+        if op in ["POP"]:
+            return f"pop r{rd}"
+        if op in ["CALL"]:
+            return f"call {imm}"
+        if op in ["RET"]:
+            return "ret"
+
+        if op in ["IN"]:
+            return f"in r{rd}"
+
+        return ""
+
+    def dump_trace(self):
+        with open("trace.txt", "w", encoding="utf-8") as f:
+            for line in self.trace_buffer:
+                f.write(line + "\n")
+
     def step(self):
         if not self.halt:
             self.micro_step()
@@ -326,6 +440,8 @@ class CPU:
 
         elif self.MP == 10:
             opcode = (self.micro_IR >> 24) & 0xFF
+
+            self.trace_instruction(self.PC, self.IR & 0xFFFFFFFF)
             self.MP = opcode * 4
         else:
             micro = self.micro_mem[self.MP]

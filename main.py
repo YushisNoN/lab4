@@ -4,6 +4,7 @@ import sys
 from typing import Any
 
 from CPU import CPU
+from Opcodes import OPCODES
 
 
 def load_program(cpu: CPU, binary_filename: str) -> None:
@@ -101,6 +102,7 @@ def apply_config(cpu: CPU, cfg: dict[str, Any]) -> None:
         cpu.instr_mem.write(int(k), v)
 
 
+
 if __name__ == "__main__":
     if len(sys.argv) < 3:
         print("Usage: python main.py program.bin input.txt [--debug to see a debug info]")
@@ -131,6 +133,7 @@ if __name__ == "__main__":
                 trace_log(cpu)
 
         print("Simulation finished (HALT).")
+        cpu.dump_trace()
         print("PROGRAM OUTPUT:")
         for idx, value in enumerate(cpu.output_buffer):
             print(f"{idx:4} | {value}")
