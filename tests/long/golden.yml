@@ -1,0 +1,117 @@
+in_source: |-
+  OUT:        .word   254
+  A1:         .word   0x00000001 ;  A = R2:R1
+  A2:         .word   0xFFFFFFFF
+  B1:         .word   0x00000001 ;  B = R4:R3
+  B2:         .word   0x00000001
+  C1:         .word   0
+  C2:         .word   0
+  .start main
+  main:
+      LOAD    R1,     A2
+      LOAD    R2,     A1
+      LOAD    R3,     B2,
+      LOAD    R4,     B1
+      LOAD    R5,     C2
+      LOAD    R6,     C1
+      ; LOW PARTS
+      ADD     R5,     R1,     R3
+      JC      set_carry
+  sum_high:
+      ADD     R6,     R2,     R4
+      ADD     R6,     R6,     R7
+      JMP     finish_program
+  set_carry:
+      LOADI   R7,     1
+      JMP sum_high
+  finish_program:
+      STORE   R6,     OUT
+      STORE   R5,     OUT
+      HALT
+out_log:
+  output_buffer:
+  - 2
+  - 0
+  ascii: "\x02\0"
+trace:
+- '8 - 10100002 - load r1, r0, #2 <- MEM[r0+2]'
+- '9 - 10200001 - load r2, r0, #1 <- MEM[r0+1]'
+- '10 - 10300004 - load r3, r0, #4 <- MEM[r0+4]'
+- '11 - 10400003 - load r4, r0, #3 <- MEM[r0+3]'
+- '12 - 10500006 - load r5, r0, #6 <- MEM[r0+6]'
+- '13 - 10600005 - load r6, r0, #5 <- MEM[r0+5]'
+- 14 - 20513000 - add r5, r1, r3 <- r1 + r3
+- 15 - 56000012 - JC 56000012
+- 16 - 20624000 - add r6, r2, r4 <- r2 + r4
+- 17 - 20667000 - add r6, r6, r7 <- r6 + r7
+- 18 - 50000014 - jmp 20 jump 20
+- 21 - 120600FE - store r6, [r0+254] -> MEM[r0+254]
+- 22 - 120500FE - store r5, [r0+254] -> MEM[r0+254]
+- 23 - 01000000 - HALT 01000000
+cycles: 70
+memory:
+- 0 254
+- 1 1
+- 2 4294967295
+- 3 1
+- 4 1
+- 5 0
+- 6 0
+- 7 0
+- 8 0
+- 9 0
+- 10 0
+- 11 0
+- 12 0
+- 13 0
+- 14 0
+- 15 0
+- 16 0
+- 17 0
+- 18 0
+- 19 0
+- 20 0
+- 21 0
+- 22 0
+- 23 0
+- 24 0
+- 25 0
+- 26 0
+- 27 0
+- 28 0
+- 29 0
+- 30 0
+- 31 0
+- 32 0
+- 33 0
+- 34 0
+- 35 0
+- 36 0
+- 37 0
+- 38 0
+- 39 0
+- 40 0
+- 41 0
+- 42 0
+- 43 0
+- 44 0
+- 45 0
+- 46 0
+- 47 0
+- 48 0
+- 49 0
+- 50 0
+- 51 0
+- 52 0
+- 53 0
+- 54 0
+- 55 0
+- 56 0
+- 57 0
+- 58 0
+- 59 0
+- 60 0
+- 61 0
+- 62 0
+- 63 0
+stack: <no stack>

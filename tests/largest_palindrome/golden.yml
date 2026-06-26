@@ -1,0 +1,633 @@
+in_source: |-
+  .org 0x10
+  OUT:        .word 254
+  ANSWER:     .word 0
+  MAX:        .word 0     ; TICK: 125304360 MAX: 906609
+  A:          .word 999
+  CONST_10:   .word 100
+  .start main
+  main:
+      LOAD    R1,     A
+      LOAD    R2,     A
+      LOADI   R14,    1
+      LOADI   R13,    100
+      LOADI   R8,     10
+      LOADI   R10,    0
+      JMP     loop_i
+  loop_i:
+      CMP     R1,     R13
+      JZ      end_program
+      LOAD    R2,     A
+      JMP     loop_j
+  loop_i_end:
+      SUB     R1,     R1,     R14
+      JMP     loop_i
+  loop_j:
+      CMP     R2,     R13
+      JZ      loop_i_end
+      MUL     R3,     R1,     R2
+      MOV     R4,     R3
+      SUB     R2,     R2,     R14
+      CALL    is_pal
+      JMP     loop_j
+  is_pal:
+      make_palindom:
+          CMP     R3,     R10
+          JZ      end_function
+          MUL     R12,    R12,    R8
+          DIV     R11,    R3,     R8
+          MUL     R11,    R11,    R8
+          SUB     R11,    R3,     R11
+          ADD     R12,    R12,    R11
+          DIV     R3,     R3,     R8
+          JMP     make_palindom
+      end_function:
+          CMP     R12,    R4
+          JNZ     ret_function
+          CALL    save_max_palindrome
+      ret_function:
+          LOADI   R12,    0
+          ret
+  save_max_palindrome:
+      LOAD    R9,     MAX
+      CMP     R9,     R12
+      JG      end_save_max_function
+      STORE   R12,    MAX
+  end_save_max_function:
+      ret
+  end_program:
+      LOAD    R1,     MAX
+      STORE   R1,     OUT
+      HALT
+out_log:
+  output_buffer:
+  - 906609
+  ascii: 󝕱
+trace:
+- 45 - 23B38000 - div r11, r3, r8 <- r3 / r8
+- 46 - 22BB8000 - mul r11, r11, r8 <- r11 * r8
+- 47 - 21B3B000 - sub r11, r3, r11 <- r3 - r11
+- 48 - 20CCB000 - add r12, r12, r11 <- r12 + r11
+- 49 - 23338000 - div r3, r3, r8 <- r3 / r8
+- 50 - 50000029 - jmp 41 jump 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 44 - 22CC8000 - mul r12, r12, r8 <- r12 * r8
+- 45 - 23B38000 - div r11, r3, r8 <- r3 / r8
+- 46 - 22BB8000 - mul r11, r11, r8 <- r11 * r8
+- 47 - 21B3B000 - sub r11, r3, r11 <- r3 - r11
+- 48 - 20CCB000 - add r12, r12, r11 <- r12 + r11
+- 49 - 23338000 - div r3, r3, r8 <- r3 / r8
+- 50 - 50000029 - jmp 41 jump 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 51 - 310C4000 - cmp r12, r4 compare r12, r4
+- 52 - 52000035 - jnz 53 jump cond 53
+- '54 - 11C00000 - loadi r12, #0'
+- 55 - 73000000 - ret ret
+- 41 - 50000022 - jmp 34 jump 34
+- 35 - 3102D000 - cmp r2, r13 compare r2, r13
+- 36 - 51000020 - jz 32 jump cond 32
+- 37 - 22312000 - mul r3, r1, r2 <- r1 * r2
+- 38 - 30430000 - mov r4, r3 <- r3
+- 39 - 2122E000 - sub r2, r2, r14 <- r2 - r14
+- 40 - 72000029 - CALL 72000029 call 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 44 - 22CC8000 - mul r12, r12, r8 <- r12 * r8
+- 45 - 23B38000 - div r11, r3, r8 <- r3 / r8
+- 46 - 22BB8000 - mul r11, r11, r8 <- r11 * r8
+- 47 - 21B3B000 - sub r11, r3, r11 <- r3 - r11
+- 48 - 20CCB000 - add r12, r12, r11 <- r12 + r11
+- 49 - 23338000 - div r3, r3, r8 <- r3 / r8
+- 50 - 50000029 - jmp 41 jump 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 44 - 22CC8000 - mul r12, r12, r8 <- r12 * r8
+- 45 - 23B38000 - div r11, r3, r8 <- r3 / r8
+- 46 - 22BB8000 - mul r11, r11, r8 <- r11 * r8
+- 47 - 21B3B000 - sub r11, r3, r11 <- r3 - r11
+- 48 - 20CCB000 - add r12, r12, r11 <- r12 + r11
+- 49 - 23338000 - div r3, r3, r8 <- r3 / r8
+- 50 - 50000029 - jmp 41 jump 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 44 - 22CC8000 - mul r12, r12, r8 <- r12 * r8
+- 45 - 23B38000 - div r11, r3, r8 <- r3 / r8
+- 46 - 22BB8000 - mul r11, r11, r8 <- r11 * r8
+- 47 - 21B3B000 - sub r11, r3, r11 <- r3 - r11
+- 48 - 20CCB000 - add r12, r12, r11 <- r12 + r11
+- 49 - 23338000 - div r3, r3, r8 <- r3 / r8
+- 50 - 50000029 - jmp 41 jump 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 44 - 22CC8000 - mul r12, r12, r8 <- r12 * r8
+- 45 - 23B38000 - div r11, r3, r8 <- r3 / r8
+- 46 - 22BB8000 - mul r11, r11, r8 <- r11 * r8
+- 47 - 21B3B000 - sub r11, r3, r11 <- r3 - r11
+- 48 - 20CCB000 - add r12, r12, r11 <- r12 + r11
+- 49 - 23338000 - div r3, r3, r8 <- r3 / r8
+- 50 - 50000029 - jmp 41 jump 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 44 - 22CC8000 - mul r12, r12, r8 <- r12 * r8
+- 45 - 23B38000 - div r11, r3, r8 <- r3 / r8
+- 46 - 22BB8000 - mul r11, r11, r8 <- r11 * r8
+- 47 - 21B3B000 - sub r11, r3, r11 <- r3 - r11
+- 48 - 20CCB000 - add r12, r12, r11 <- r12 + r11
+- 49 - 23338000 - div r3, r3, r8 <- r3 / r8
+- 50 - 50000029 - jmp 41 jump 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 51 - 310C4000 - cmp r12, r4 compare r12, r4
+- 52 - 52000035 - jnz 53 jump cond 53
+- '54 - 11C00000 - loadi r12, #0'
+- 55 - 73000000 - ret ret
+- 41 - 50000022 - jmp 34 jump 34
+- 35 - 3102D000 - cmp r2, r13 compare r2, r13
+- 36 - 51000020 - jz 32 jump cond 32
+- 37 - 22312000 - mul r3, r1, r2 <- r1 * r2
+- 38 - 30430000 - mov r4, r3 <- r3
+- 39 - 2122E000 - sub r2, r2, r14 <- r2 - r14
+- 40 - 72000029 - CALL 72000029 call 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 44 - 22CC8000 - mul r12, r12, r8 <- r12 * r8
+- 45 - 23B38000 - div r11, r3, r8 <- r3 / r8
+- 46 - 22BB8000 - mul r11, r11, r8 <- r11 * r8
+- 47 - 21B3B000 - sub r11, r3, r11 <- r3 - r11
+- 48 - 20CCB000 - add r12, r12, r11 <- r12 + r11
+- 49 - 23338000 - div r3, r3, r8 <- r3 / r8
+- 50 - 50000029 - jmp 41 jump 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 44 - 22CC8000 - mul r12, r12, r8 <- r12 * r8
+- 45 - 23B38000 - div r11, r3, r8 <- r3 / r8
+- 46 - 22BB8000 - mul r11, r11, r8 <- r11 * r8
+- 47 - 21B3B000 - sub r11, r3, r11 <- r3 - r11
+- 48 - 20CCB000 - add r12, r12, r11 <- r12 + r11
+- 49 - 23338000 - div r3, r3, r8 <- r3 / r8
+- 50 - 50000029 - jmp 41 jump 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 44 - 22CC8000 - mul r12, r12, r8 <- r12 * r8
+- 45 - 23B38000 - div r11, r3, r8 <- r3 / r8
+- 46 - 22BB8000 - mul r11, r11, r8 <- r11 * r8
+- 47 - 21B3B000 - sub r11, r3, r11 <- r3 - r11
+- 48 - 20CCB000 - add r12, r12, r11 <- r12 + r11
+- 49 - 23338000 - div r3, r3, r8 <- r3 / r8
+- 50 - 50000029 - jmp 41 jump 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 44 - 22CC8000 - mul r12, r12, r8 <- r12 * r8
+- 45 - 23B38000 - div r11, r3, r8 <- r3 / r8
+- 46 - 22BB8000 - mul r11, r11, r8 <- r11 * r8
+- 47 - 21B3B000 - sub r11, r3, r11 <- r3 - r11
+- 48 - 20CCB000 - add r12, r12, r11 <- r12 + r11
+- 49 - 23338000 - div r3, r3, r8 <- r3 / r8
+- 50 - 50000029 - jmp 41 jump 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 44 - 22CC8000 - mul r12, r12, r8 <- r12 * r8
+- 45 - 23B38000 - div r11, r3, r8 <- r3 / r8
+- 46 - 22BB8000 - mul r11, r11, r8 <- r11 * r8
+- 47 - 21B3B000 - sub r11, r3, r11 <- r3 - r11
+- 48 - 20CCB000 - add r12, r12, r11 <- r12 + r11
+- 49 - 23338000 - div r3, r3, r8 <- r3 / r8
+- 50 - 50000029 - jmp 41 jump 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 51 - 310C4000 - cmp r12, r4 compare r12, r4
+- 52 - 52000035 - jnz 53 jump cond 53
+- '54 - 11C00000 - loadi r12, #0'
+- 55 - 73000000 - ret ret
+- 41 - 50000022 - jmp 34 jump 34
+- 35 - 3102D000 - cmp r2, r13 compare r2, r13
+- 36 - 51000020 - jz 32 jump cond 32
+- 37 - 22312000 - mul r3, r1, r2 <- r1 * r2
+- 38 - 30430000 - mov r4, r3 <- r3
+- 39 - 2122E000 - sub r2, r2, r14 <- r2 - r14
+- 40 - 72000029 - CALL 72000029 call 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 44 - 22CC8000 - mul r12, r12, r8 <- r12 * r8
+- 45 - 23B38000 - div r11, r3, r8 <- r3 / r8
+- 46 - 22BB8000 - mul r11, r11, r8 <- r11 * r8
+- 47 - 21B3B000 - sub r11, r3, r11 <- r3 - r11
+- 48 - 20CCB000 - add r12, r12, r11 <- r12 + r11
+- 49 - 23338000 - div r3, r3, r8 <- r3 / r8
+- 50 - 50000029 - jmp 41 jump 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 44 - 22CC8000 - mul r12, r12, r8 <- r12 * r8
+- 45 - 23B38000 - div r11, r3, r8 <- r3 / r8
+- 46 - 22BB8000 - mul r11, r11, r8 <- r11 * r8
+- 47 - 21B3B000 - sub r11, r3, r11 <- r3 - r11
+- 48 - 20CCB000 - add r12, r12, r11 <- r12 + r11
+- 49 - 23338000 - div r3, r3, r8 <- r3 / r8
+- 50 - 50000029 - jmp 41 jump 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 44 - 22CC8000 - mul r12, r12, r8 <- r12 * r8
+- 45 - 23B38000 - div r11, r3, r8 <- r3 / r8
+- 46 - 22BB8000 - mul r11, r11, r8 <- r11 * r8
+- 47 - 21B3B000 - sub r11, r3, r11 <- r3 - r11
+- 48 - 20CCB000 - add r12, r12, r11 <- r12 + r11
+- 49 - 23338000 - div r3, r3, r8 <- r3 / r8
+- 50 - 50000029 - jmp 41 jump 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 44 - 22CC8000 - mul r12, r12, r8 <- r12 * r8
+- 45 - 23B38000 - div r11, r3, r8 <- r3 / r8
+- 46 - 22BB8000 - mul r11, r11, r8 <- r11 * r8
+- 47 - 21B3B000 - sub r11, r3, r11 <- r3 - r11
+- 48 - 20CCB000 - add r12, r12, r11 <- r12 + r11
+- 49 - 23338000 - div r3, r3, r8 <- r3 / r8
+- 50 - 50000029 - jmp 41 jump 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 44 - 22CC8000 - mul r12, r12, r8 <- r12 * r8
+- 45 - 23B38000 - div r11, r3, r8 <- r3 / r8
+- 46 - 22BB8000 - mul r11, r11, r8 <- r11 * r8
+- 47 - 21B3B000 - sub r11, r3, r11 <- r3 - r11
+- 48 - 20CCB000 - add r12, r12, r11 <- r12 + r11
+- 49 - 23338000 - div r3, r3, r8 <- r3 / r8
+- 50 - 50000029 - jmp 41 jump 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 51 - 310C4000 - cmp r12, r4 compare r12, r4
+- 52 - 52000035 - jnz 53 jump cond 53
+- '54 - 11C00000 - loadi r12, #0'
+- 55 - 73000000 - ret ret
+- 41 - 50000022 - jmp 34 jump 34
+- 35 - 3102D000 - cmp r2, r13 compare r2, r13
+- 36 - 51000020 - jz 32 jump cond 32
+- 37 - 22312000 - mul r3, r1, r2 <- r1 * r2
+- 38 - 30430000 - mov r4, r3 <- r3
+- 39 - 2122E000 - sub r2, r2, r14 <- r2 - r14
+- 40 - 72000029 - CALL 72000029 call 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 44 - 22CC8000 - mul r12, r12, r8 <- r12 * r8
+- 45 - 23B38000 - div r11, r3, r8 <- r3 / r8
+- 46 - 22BB8000 - mul r11, r11, r8 <- r11 * r8
+- 47 - 21B3B000 - sub r11, r3, r11 <- r3 - r11
+- 48 - 20CCB000 - add r12, r12, r11 <- r12 + r11
+- 49 - 23338000 - div r3, r3, r8 <- r3 / r8
+- 50 - 50000029 - jmp 41 jump 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 44 - 22CC8000 - mul r12, r12, r8 <- r12 * r8
+- 45 - 23B38000 - div r11, r3, r8 <- r3 / r8
+- 46 - 22BB8000 - mul r11, r11, r8 <- r11 * r8
+- 47 - 21B3B000 - sub r11, r3, r11 <- r3 - r11
+- 48 - 20CCB000 - add r12, r12, r11 <- r12 + r11
+- 49 - 23338000 - div r3, r3, r8 <- r3 / r8
+- 50 - 50000029 - jmp 41 jump 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 44 - 22CC8000 - mul r12, r12, r8 <- r12 * r8
+- 45 - 23B38000 - div r11, r3, r8 <- r3 / r8
+- 46 - 22BB8000 - mul r11, r11, r8 <- r11 * r8
+- 47 - 21B3B000 - sub r11, r3, r11 <- r3 - r11
+- 48 - 20CCB000 - add r12, r12, r11 <- r12 + r11
+- 49 - 23338000 - div r3, r3, r8 <- r3 / r8
+- 50 - 50000029 - jmp 41 jump 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 44 - 22CC8000 - mul r12, r12, r8 <- r12 * r8
+- 45 - 23B38000 - div r11, r3, r8 <- r3 / r8
+- 46 - 22BB8000 - mul r11, r11, r8 <- r11 * r8
+- 47 - 21B3B000 - sub r11, r3, r11 <- r3 - r11
+- 48 - 20CCB000 - add r12, r12, r11 <- r12 + r11
+- 49 - 23338000 - div r3, r3, r8 <- r3 / r8
+- 50 - 50000029 - jmp 41 jump 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 44 - 22CC8000 - mul r12, r12, r8 <- r12 * r8
+- 45 - 23B38000 - div r11, r3, r8 <- r3 / r8
+- 46 - 22BB8000 - mul r11, r11, r8 <- r11 * r8
+- 47 - 21B3B000 - sub r11, r3, r11 <- r3 - r11
+- 48 - 20CCB000 - add r12, r12, r11 <- r12 + r11
+- 49 - 23338000 - div r3, r3, r8 <- r3 / r8
+- 50 - 50000029 - jmp 41 jump 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 51 - 310C4000 - cmp r12, r4 compare r12, r4
+- 52 - 52000035 - jnz 53 jump cond 53
+- '54 - 11C00000 - loadi r12, #0'
+- 55 - 73000000 - ret ret
+- 41 - 50000022 - jmp 34 jump 34
+- 35 - 3102D000 - cmp r2, r13 compare r2, r13
+- 36 - 51000020 - jz 32 jump cond 32
+- 37 - 22312000 - mul r3, r1, r2 <- r1 * r2
+- 38 - 30430000 - mov r4, r3 <- r3
+- 39 - 2122E000 - sub r2, r2, r14 <- r2 - r14
+- 40 - 72000029 - CALL 72000029 call 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 44 - 22CC8000 - mul r12, r12, r8 <- r12 * r8
+- 45 - 23B38000 - div r11, r3, r8 <- r3 / r8
+- 46 - 22BB8000 - mul r11, r11, r8 <- r11 * r8
+- 47 - 21B3B000 - sub r11, r3, r11 <- r3 - r11
+- 48 - 20CCB000 - add r12, r12, r11 <- r12 + r11
+- 49 - 23338000 - div r3, r3, r8 <- r3 / r8
+- 50 - 50000029 - jmp 41 jump 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 44 - 22CC8000 - mul r12, r12, r8 <- r12 * r8
+- 45 - 23B38000 - div r11, r3, r8 <- r3 / r8
+- 46 - 22BB8000 - mul r11, r11, r8 <- r11 * r8
+- 47 - 21B3B000 - sub r11, r3, r11 <- r3 - r11
+- 48 - 20CCB000 - add r12, r12, r11 <- r12 + r11
+- 49 - 23338000 - div r3, r3, r8 <- r3 / r8
+- 50 - 50000029 - jmp 41 jump 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 44 - 22CC8000 - mul r12, r12, r8 <- r12 * r8
+- 45 - 23B38000 - div r11, r3, r8 <- r3 / r8
+- 46 - 22BB8000 - mul r11, r11, r8 <- r11 * r8
+- 47 - 21B3B000 - sub r11, r3, r11 <- r3 - r11
+- 48 - 20CCB000 - add r12, r12, r11 <- r12 + r11
+- 49 - 23338000 - div r3, r3, r8 <- r3 / r8
+- 50 - 50000029 - jmp 41 jump 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 44 - 22CC8000 - mul r12, r12, r8 <- r12 * r8
+- 45 - 23B38000 - div r11, r3, r8 <- r3 / r8
+- 46 - 22BB8000 - mul r11, r11, r8 <- r11 * r8
+- 47 - 21B3B000 - sub r11, r3, r11 <- r3 - r11
+- 48 - 20CCB000 - add r12, r12, r11 <- r12 + r11
+- 49 - 23338000 - div r3, r3, r8 <- r3 / r8
+- 50 - 50000029 - jmp 41 jump 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 44 - 22CC8000 - mul r12, r12, r8 <- r12 * r8
+- 45 - 23B38000 - div r11, r3, r8 <- r3 / r8
+- 46 - 22BB8000 - mul r11, r11, r8 <- r11 * r8
+- 47 - 21B3B000 - sub r11, r3, r11 <- r3 - r11
+- 48 - 20CCB000 - add r12, r12, r11 <- r12 + r11
+- 49 - 23338000 - div r3, r3, r8 <- r3 / r8
+- 50 - 50000029 - jmp 41 jump 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 51 - 310C4000 - cmp r12, r4 compare r12, r4
+- 52 - 52000035 - jnz 53 jump cond 53
+- '54 - 11C00000 - loadi r12, #0'
+- 55 - 73000000 - ret ret
+- 41 - 50000022 - jmp 34 jump 34
+- 35 - 3102D000 - cmp r2, r13 compare r2, r13
+- 36 - 51000020 - jz 32 jump cond 32
+- 37 - 22312000 - mul r3, r1, r2 <- r1 * r2
+- 38 - 30430000 - mov r4, r3 <- r3
+- 39 - 2122E000 - sub r2, r2, r14 <- r2 - r14
+- 40 - 72000029 - CALL 72000029 call 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 44 - 22CC8000 - mul r12, r12, r8 <- r12 * r8
+- 45 - 23B38000 - div r11, r3, r8 <- r3 / r8
+- 46 - 22BB8000 - mul r11, r11, r8 <- r11 * r8
+- 47 - 21B3B000 - sub r11, r3, r11 <- r3 - r11
+- 48 - 20CCB000 - add r12, r12, r11 <- r12 + r11
+- 49 - 23338000 - div r3, r3, r8 <- r3 / r8
+- 50 - 50000029 - jmp 41 jump 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 44 - 22CC8000 - mul r12, r12, r8 <- r12 * r8
+- 45 - 23B38000 - div r11, r3, r8 <- r3 / r8
+- 46 - 22BB8000 - mul r11, r11, r8 <- r11 * r8
+- 47 - 21B3B000 - sub r11, r3, r11 <- r3 - r11
+- 48 - 20CCB000 - add r12, r12, r11 <- r12 + r11
+- 49 - 23338000 - div r3, r3, r8 <- r3 / r8
+- 50 - 50000029 - jmp 41 jump 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 44 - 22CC8000 - mul r12, r12, r8 <- r12 * r8
+- 45 - 23B38000 - div r11, r3, r8 <- r3 / r8
+- 46 - 22BB8000 - mul r11, r11, r8 <- r11 * r8
+- 47 - 21B3B000 - sub r11, r3, r11 <- r3 - r11
+- 48 - 20CCB000 - add r12, r12, r11 <- r12 + r11
+- 49 - 23338000 - div r3, r3, r8 <- r3 / r8
+- 50 - 50000029 - jmp 41 jump 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 44 - 22CC8000 - mul r12, r12, r8 <- r12 * r8
+- 45 - 23B38000 - div r11, r3, r8 <- r3 / r8
+- 46 - 22BB8000 - mul r11, r11, r8 <- r11 * r8
+- 47 - 21B3B000 - sub r11, r3, r11 <- r3 - r11
+- 48 - 20CCB000 - add r12, r12, r11 <- r12 + r11
+- 49 - 23338000 - div r3, r3, r8 <- r3 / r8
+- 50 - 50000029 - jmp 41 jump 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 44 - 22CC8000 - mul r12, r12, r8 <- r12 * r8
+- 45 - 23B38000 - div r11, r3, r8 <- r3 / r8
+- 46 - 22BB8000 - mul r11, r11, r8 <- r11 * r8
+- 47 - 21B3B000 - sub r11, r3, r11 <- r3 - r11
+- 48 - 20CCB000 - add r12, r12, r11 <- r12 + r11
+- 49 - 23338000 - div r3, r3, r8 <- r3 / r8
+- 50 - 50000029 - jmp 41 jump 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 51 - 310C4000 - cmp r12, r4 compare r12, r4
+- 52 - 52000035 - jnz 53 jump cond 53
+- '54 - 11C00000 - loadi r12, #0'
+- 55 - 73000000 - ret ret
+- 41 - 50000022 - jmp 34 jump 34
+- 35 - 3102D000 - cmp r2, r13 compare r2, r13
+- 36 - 51000020 - jz 32 jump cond 32
+- 37 - 22312000 - mul r3, r1, r2 <- r1 * r2
+- 38 - 30430000 - mov r4, r3 <- r3
+- 39 - 2122E000 - sub r2, r2, r14 <- r2 - r14
+- 40 - 72000029 - CALL 72000029 call 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 44 - 22CC8000 - mul r12, r12, r8 <- r12 * r8
+- 45 - 23B38000 - div r11, r3, r8 <- r3 / r8
+- 46 - 22BB8000 - mul r11, r11, r8 <- r11 * r8
+- 47 - 21B3B000 - sub r11, r3, r11 <- r3 - r11
+- 48 - 20CCB000 - add r12, r12, r11 <- r12 + r11
+- 49 - 23338000 - div r3, r3, r8 <- r3 / r8
+- 50 - 50000029 - jmp 41 jump 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 44 - 22CC8000 - mul r12, r12, r8 <- r12 * r8
+- 45 - 23B38000 - div r11, r3, r8 <- r3 / r8
+- 46 - 22BB8000 - mul r11, r11, r8 <- r11 * r8
+- 47 - 21B3B000 - sub r11, r3, r11 <- r3 - r11
+- 48 - 20CCB000 - add r12, r12, r11 <- r12 + r11
+- 49 - 23338000 - div r3, r3, r8 <- r3 / r8
+- 50 - 50000029 - jmp 41 jump 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 44 - 22CC8000 - mul r12, r12, r8 <- r12 * r8
+- 45 - 23B38000 - div r11, r3, r8 <- r3 / r8
+- 46 - 22BB8000 - mul r11, r11, r8 <- r11 * r8
+- 47 - 21B3B000 - sub r11, r3, r11 <- r3 - r11
+- 48 - 20CCB000 - add r12, r12, r11 <- r12 + r11
+- 49 - 23338000 - div r3, r3, r8 <- r3 / r8
+- 50 - 50000029 - jmp 41 jump 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 44 - 22CC8000 - mul r12, r12, r8 <- r12 * r8
+- 45 - 23B38000 - div r11, r3, r8 <- r3 / r8
+- 46 - 22BB8000 - mul r11, r11, r8 <- r11 * r8
+- 47 - 21B3B000 - sub r11, r3, r11 <- r3 - r11
+- 48 - 20CCB000 - add r12, r12, r11 <- r12 + r11
+- 49 - 23338000 - div r3, r3, r8 <- r3 / r8
+- 50 - 50000029 - jmp 41 jump 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 44 - 22CC8000 - mul r12, r12, r8 <- r12 * r8
+- 45 - 23B38000 - div r11, r3, r8 <- r3 / r8
+- 46 - 22BB8000 - mul r11, r11, r8 <- r11 * r8
+- 47 - 21B3B000 - sub r11, r3, r11 <- r3 - r11
+- 48 - 20CCB000 - add r12, r12, r11 <- r12 + r11
+- 49 - 23338000 - div r3, r3, r8 <- r3 / r8
+- 50 - 50000029 - jmp 41 jump 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 51 - 310C4000 - cmp r12, r4 compare r12, r4
+- 52 - 52000035 - jnz 53 jump cond 53
+- '54 - 11C00000 - loadi r12, #0'
+- 55 - 73000000 - ret ret
+- 41 - 50000022 - jmp 34 jump 34
+- 35 - 3102D000 - cmp r2, r13 compare r2, r13
+- 36 - 51000020 - jz 32 jump cond 32
+- 37 - 22312000 - mul r3, r1, r2 <- r1 * r2
+- 38 - 30430000 - mov r4, r3 <- r3
+- 39 - 2122E000 - sub r2, r2, r14 <- r2 - r14
+- 40 - 72000029 - CALL 72000029 call 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 44 - 22CC8000 - mul r12, r12, r8 <- r12 * r8
+- 45 - 23B38000 - div r11, r3, r8 <- r3 / r8
+- 46 - 22BB8000 - mul r11, r11, r8 <- r11 * r8
+- 47 - 21B3B000 - sub r11, r3, r11 <- r3 - r11
+- 48 - 20CCB000 - add r12, r12, r11 <- r12 + r11
+- 49 - 23338000 - div r3, r3, r8 <- r3 / r8
+- 50 - 50000029 - jmp 41 jump 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 44 - 22CC8000 - mul r12, r12, r8 <- r12 * r8
+- 45 - 23B38000 - div r11, r3, r8 <- r3 / r8
+- 46 - 22BB8000 - mul r11, r11, r8 <- r11 * r8
+- 47 - 21B3B000 - sub r11, r3, r11 <- r3 - r11
+- 48 - 20CCB000 - add r12, r12, r11 <- r12 + r11
+- 49 - 23338000 - div r3, r3, r8 <- r3 / r8
+- 50 - 50000029 - jmp 41 jump 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 44 - 22CC8000 - mul r12, r12, r8 <- r12 * r8
+- 45 - 23B38000 - div r11, r3, r8 <- r3 / r8
+- 46 - 22BB8000 - mul r11, r11, r8 <- r11 * r8
+- 47 - 21B3B000 - sub r11, r3, r11 <- r3 - r11
+- 48 - 20CCB000 - add r12, r12, r11 <- r12 + r11
+- 49 - 23338000 - div r3, r3, r8 <- r3 / r8
+- 50 - 50000029 - jmp 41 jump 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 44 - 22CC8000 - mul r12, r12, r8 <- r12 * r8
+- 45 - 23B38000 - div r11, r3, r8 <- r3 / r8
+- 46 - 22BB8000 - mul r11, r11, r8 <- r11 * r8
+- 47 - 21B3B000 - sub r11, r3, r11 <- r3 - r11
+- 48 - 20CCB000 - add r12, r12, r11 <- r12 + r11
+- 49 - 23338000 - div r3, r3, r8 <- r3 / r8
+- 50 - 50000029 - jmp 41 jump 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 44 - 22CC8000 - mul r12, r12, r8 <- r12 * r8
+- 45 - 23B38000 - div r11, r3, r8 <- r3 / r8
+- 46 - 22BB8000 - mul r11, r11, r8 <- r11 * r8
+- 47 - 21B3B000 - sub r11, r3, r11 <- r3 - r11
+- 48 - 20CCB000 - add r12, r12, r11 <- r12 + r11
+- 49 - 23338000 - div r3, r3, r8 <- r3 / r8
+- 50 - 50000029 - jmp 41 jump 41
+- 42 - 3103A000 - cmp r3, r10 compare r3, r10
+- 43 - 51000032 - jz 50 jump cond 50
+- 51 - 310C4000 - cmp r12, r4 compare r12, r4
+- 52 - 52000035 - jnz 53 jump cond 53
+- 53 - 72000037 - CALL 72000037 call 55
+- '56 - 10900012 - load r9, r0, #18 <- MEM[r0+18]'
+- 57 - 3109C000 - cmp r9, r12 compare r9, r12
+- 58 - 5300003B - jg 59 jump cond 59
+- 60 - 73000000 - ret ret
+- '54 - 11C00000 - loadi r12, #0'
+- 55 - 73000000 - ret ret
+- 41 - 50000022 - jmp 34 jump 34
+- 35 - 3102D000 - cmp r2, r13 compare r2, r13
+- 36 - 51000020 - jz 32 jump cond 32
+- 33 - 2111E000 - sub r1, r1, r14 <- r1 - r14
+- 34 - 5000001C - jmp 28 jump 28
+- 29 - 3101D000 - cmp r1, r13 compare r1, r13
+- 30 - 5100003C - jz 60 jump cond 60
+- '61 - 10100012 - load r1, r0, #18 <- MEM[r0+18]'
+- 62 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
+- 63 - 01000000 - HALT 01000000
+cycles: 248681744
+memory:
+- 0 0
+- 1 0
+- 2 0
+- 3 0
+- 4 0
+- 5 0
+- 6 0
+- 7 0
+- 8 0
+- 9 0
+- 10 0
+- 11 0
+- 12 0
+- 13 0
+- 14 0
+- 15 0
+- 16 254
+- 17 0
+- 18 906609
+- 19 999
+- 20 100
+- 21 0
+- 22 0
+- 23 0
+- 24 0
+- 25 0
+- 26 0
+- 27 0
+- 28 0
+- 29 0
+- 30 0
+- 31 0
+- 32 0
+- 33 0
+- 34 0
+- 35 0
+- 36 0
+- 37 0
+- 38 0
+- 39 0
+- 40 0
+- 41 0
+- 42 0
+- 43 0
+- 44 0
+- 45 0
+- 46 0
+- 47 0
+- 48 0
+- 49 0
+- 50 0
+- 51 0
+- 52 0
+- 53 0
+- 54 0
+- 55 0
+- 56 0
+- 57 0
+- 58 0
+- 59 0
+- 60 0
+- 61 0
+- 62 0
+- 63 0
+stack: <no stack>
