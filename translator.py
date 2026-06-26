@@ -177,19 +177,23 @@ def translate(input_path: str, output: str = "program.bin") -> None:
         elif first_word == ".str":
             text = line.split('"')[1]
             str_addr = current_pc
-
-            if ":" in parts[0]:
-                labels[parts[0].replace(":", "")] = str_addr
-
-            memory_map[current_pc] = ("DATA", len(text) - 1)
+            memory_map[current_pc] = ("DATA", len(text))
             current_pc += 1
-
-            for ch in range(len(text)):
-                if text[ch] != "\\":
-                    memory_map[current_pc] = ("DATA", ord(text[ch]))
-                elif ch + 1 < len(text) and text[ch] == "\\" and text[ch + 1] == "n":
-                    memory_map[current_pc] = ("DATA", 10)
-
+            i = 0
+            while i < len(text):
+                if text[i] == "\\" and i + 1 < len(text):
+                    if text[i + 1] == "n":
+                        memory_map[current_pc] = ("DATA", 10)
+                        i += 2
+                    elif text[i + 1] == "t":
+                        memory_map[current_pc] = ("DATA", 9)
+                        i += 2
+                    else:
+                        memory_map[current_pc] = ("DATA", ord(text[i + 1]))
+                        i += 2
+                else:
+                    memory_map[current_pc] = ("DATA", ord(text[i]))
+                    i += 1
                 current_pc += 1
 
         elif first_word == ".org":

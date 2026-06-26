@@ -1,6 +1,6 @@
 
 OUT:	.word	254
-STRING:	.str	"Hello, world!"
+STRING:	.str	"Hello world!"
 
 .start	main
 

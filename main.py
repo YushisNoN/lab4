@@ -13,27 +13,21 @@ def load_program(cpu: CPU, binary_filename: str) -> None:
             if not header:
                 return
             cpu.PC = struct.unpack(">I", header)[0]
-            print(f"Entry point (PC) set to: {cpu.PC}")
 
             num_code_sections = struct.unpack(">I", f.read(4))[0]
-            print(f"Code sections: {num_code_sections}")
-            for i in range(num_code_sections):
+            for _i in range(num_code_sections):
                 target_addr, count = struct.unpack(">II", f.read(8))
-                print(f"[CODE] section {i}: addr={target_addr}, words={count}")
+
                 for j in range(count):
                     word = struct.unpack(">I", f.read(4))[0]
                     cpu.instr_mem.write(target_addr + j, word)
 
             num_data_sections = struct.unpack(">I", f.read(4))[0]
-            print(f"Data sections: {num_data_sections}")
-            for i in range(num_data_sections):
+            for _i in range(num_data_sections):
                 target_addr, count = struct.unpack(">II", f.read(8))
-                print(f"[DATA] section {i}: addr={target_addr}, words={count}")
                 for j in range(count):
                     word = struct.unpack(">I", f.read(4))[0]
                     cpu.data_mem.write(target_addr + j, word)
-
-        print("Successfully loaded program.")
 
     except Exception as e:
         print(f"Load error: {e}")
