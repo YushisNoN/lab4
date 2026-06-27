@@ -21,6 +21,11 @@ loop_i:
 	CMP		R1,		R13
 	JZ 		end_program
 	
+	MUL		R6,		R1,		R1
+	LOAD	R7,		MAX
+	CMP		R6,		R7
+	JL		end_program
+	
 	LOAD	R2,		A
 	JMP		loop_j
 	
@@ -35,8 +40,12 @@ loop_j:
 	MUL		R3,		R1,		R2
 	MOV		R4, 	R3
 	SUB		R2,		R2,		R14
+	
+	CMP 	R3,		R7
+	JL		skip
 	CALL	is_pal
-	JMP		loop_j
+	skip:
+		JMP		loop_j
 
 is_pal:
 	make_palindom:

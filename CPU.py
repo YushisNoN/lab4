@@ -317,6 +317,27 @@ class CPU:
         if mnem == "RET":
             return "ret"
 
+        if mnem == "HALT":
+            return "halt"
+
+        if mnem == "PSTR":
+            return f"pstr r{rd}"
+
+        if mnem == "OUT":
+            return f"out r{rs1}"
+
+        if mnem == "PUSH":
+            return f"push r{rs1}"
+
+        if mnem == "POP":
+            return f"pop r{rd}"
+
+        if mnem == "CALL":
+            return f"call {imm}"
+
+        if mnem == "LOOP":
+            return f"loop r{rd}, {imm}"
+
         return f"{mnem} {word:08X}"
 
     def trace_instruction(self, addr: int, word: int):
@@ -376,6 +397,8 @@ class CPU:
         if op in ["IN"]:
             return f"in r{rd}"
 
+
+
         return ""
 
     def dump_trace(self):
@@ -431,16 +454,17 @@ class CPU:
         if self.MP == 0:
             self.IR = self.instr_mem.read(self.PC)
             self.micro_IR = self.IR
+            self.trace_PC = self.PC
             self.MP = 1
 
         elif self.MP == 1:
             self.PC += 1
             self.MP = 10
 
+
         elif self.MP == 10:
             opcode = (self.micro_IR >> 24) & 0xFF
-
-            self.trace_instruction(self.PC, self.IR & 0xFFFFFFFF)
+            self.trace_instruction(self.trace_PC, self.IR & 0xFFFFFFFF)
             self.MP = opcode * 4
         else:
             micro = self.micro_mem[self.MP]
