@@ -243,7 +243,7 @@ class CPU:
         self.micro_mem[base] = MicroInstruction(pc_write=1, cond="GE")
         self.micro_mem[base + 1] = MicroInstruction(jump=1, next_addr=0)
 
-        base = 0x55 * 4
+        base = 0x56 * 4
         self.micro_mem[base] = MicroInstruction(pc_write=1, cond="C")
         self.micro_mem[base + 1] = MicroInstruction(jump=1, next_addr=0)
 
@@ -269,17 +269,6 @@ class CPU:
         base = 0x73 * 4
         self.micro_mem[base] = MicroInstruction(mem_read=1, mem_addr="SP", reg_write=0, sp_inc=1)
         self.micro_mem[base + 1] = MicroInstruction(jump=1, next_addr="RET_PC")
-
-        base = 0x74 * 4
-        self.micro_mem[base] = MicroInstruction(jump=1, next_addr="PSTR")
-
-        base = 0x75 * 4
-        self.micro_mem[base] = MicroInstruction(mem_read=1, mem_addr="IN", reg_write=1)
-        self.micro_mem[base + 1] = MicroInstruction(jump=1, next_addr=0)
-
-        base = 0x76 * 4
-        self.micro_mem[base] = MicroInstruction(mem_write=1, mem_addr="OUT")
-        self.micro_mem[base + 1] = MicroInstruction(jump=1, next_addr=0)
 
     def disassemble(self, word: int) -> str:
         opcode = (word >> 24) & 0xFF
@@ -311,20 +300,11 @@ class CPU:
         if mnem == "MOV":
             return f"mov r{rd}, r{rs1}"
 
-        if mnem == "IN":
-            return f"in r{rd}"
-
         if mnem == "RET":
             return "ret"
 
         if mnem == "HALT":
             return "halt"
-
-        if mnem == "PSTR":
-            return f"pstr r{rd}"
-
-        if mnem == "OUT":
-            return f"out r{rs1}"
 
         if mnem == "PUSH":
             return f"push r{rs1}"
@@ -393,12 +373,6 @@ class CPU:
             return f"call {imm}"
         if op in ["RET"]:
             return "ret"
-
-        if op in ["IN"]:
-            return f"in r{rd}"
-
-
-
         return ""
 
     def dump_trace(self):
@@ -428,9 +402,6 @@ class CPU:
 
         if name == "SP":
             return self.SP
-
-        if name == "IN":
-            return self.IN
 
         return 0
 
@@ -474,16 +445,6 @@ class CPU:
 
             if micro.next_addr == "HALT":
                 self.halt = True
-                self.MP = 0
-                return
-
-            if micro.next_addr == "PSTR":
-                rd = (self.micro_IR >> 20) & 0xF
-                addr = self.regs[rd]
-                length = self.data_mem.read(addr)
-                for i in range(length):
-                    c = self.data_mem.read(addr + i + 1)
-                    self.output_buffer.append(self.data_mem.read(addr + i + 1))
                 self.MP = 0
                 return
 
@@ -545,6 +506,7 @@ class CPU:
                         addr = self.get_addr("rs1")
                     else:
                         addr = self.micro_IR & 0xFFF
+
                 if addr == self.IN:
                     if self.input_buffer:
                         self.buffer_reg = self.input_buffer.pop(0)
@@ -596,6 +558,7 @@ class CPU:
                     val = self.get_src("rs1")
 
                 if addr == self.OUT:
+
                     self.output_buffer.append(val)
                 else:
                     self.data_mem.write(addr, val)

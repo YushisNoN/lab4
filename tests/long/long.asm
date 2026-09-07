@@ -12,11 +12,10 @@ C2:			.word   0
 main:
 	LOAD	R1,		A2
 	LOAD	R2,		A1
-	LOAD	R3,		B2,
+	LOAD	R3,		B2
 	LOAD	R4,		B1
 	LOAD	R5,		C2
 	LOAD	R6,		C1
-	
 	; LOW PARTS
 	ADD		R5,		R1,		R3
 	JC		set_carry
@@ -28,9 +27,9 @@ sum_high:
 	
 set_carry:
 	LOADI	R7,		1
-	JMP sum_high
+	JMP 	sum_high
 
 finish_program:
-	STORE	R6,		OUT
-	STORE 	R5,		OUT
+	STORE	R6,		[OUT]
+	STORE 	R5,		[OUT]
 	HALT

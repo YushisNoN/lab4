@@ -29,8 +29,6 @@ OPCODES = {
     "CALL": 0x72,
     "RET": 0x73,
     "PSTR": 0x74,
-    "IN": 0x75,
-    "OUT": 0x76,
 }
 
 PORTS = {"RS": 253, "OUT": 254, "IN": 255}

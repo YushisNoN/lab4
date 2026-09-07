@@ -244,31 +244,43 @@ def translate(input_path: str, output: str = "program.bin") -> None:
                 elif mnemonic == "LOAD":
                     rd = int(parts[1][1:])
                     arg2 = parts[2]
-
+                    rs1 = 0
+                    imm = 0
                     if arg2.startswith("[") and arg2.endswith("]"):
-                        reg = int(arg2[2:-1])
-                        rs1 = reg
+                        inner = arg2[1:-1].strip()
+
+                        if inner.startswith("R") or inner.startswith("r"):
+                            rs1 = int(inner[1:])
+                        elif inner in labels:
+                            imm = memory_map[labels[inner]][1]
+                        else:
+                            imm = parse_value(inner)
+                    elif arg2.startswith("R") or arg2.startswith("r"):
+                        rs1 = int(arg2[1:])
                     elif arg2 in labels:
                         imm = labels[arg2]
-                    elif arg2.startswith("R"):
-                        rs1 = int(arg2[1:])
                     else:
                         imm = parse_value(arg2)
                 elif mnemonic == "LOADI":
                     imm = parse_value(parts[2])
                     rd = int(parts[1][1:])
                 elif mnemonic == "STORE":
-                    rs1 = int(parts[1][1:])
+                    rs1 = int(parts[1][1:]) if (parts[1].startswith("R") or parts[1].startswith("r")) else 0
                     arg2 = parts[2]
+                    rs2 = 0
+                    imm = 0
                     if arg2.startswith("[") and arg2.endswith("]"):
-                        rs2 = int(arg2[2:-1])
-                        imm = 0
-                    elif arg2 in Opcodes.PORTS:
-                        imm = Opcodes.PORTS[arg2]
+                        inner = arg2[1:-1].strip()
+                        if inner.startswith("R") or inner.startswith("r"):
+                            rs2 = int(inner[1:])
+                        elif inner in labels:
+                            imm = memory_map[labels[inner]][1]
+                        else:
+                            imm = parse_value(inner)
+                    elif arg2.startswith("R") or arg2.startswith("r"):
+                        rs2 = int(arg2[1:])
                     elif arg2 in labels:
                         imm = labels[arg2]
-                    elif arg2.startswith("R"):
-                        rs2 = int(arg2[1:])
                     else:
                         imm = parse_value(arg2)
                 elif mnemonic in ["ADD", "SUB", "MUL", "DIV"]:
@@ -288,8 +300,6 @@ def translate(input_path: str, output: str = "program.bin") -> None:
                     rs1 = int(parts[1][1:])
                 elif mnemonic == "POP":
                     rd = int(parts[1][1:])
-                elif mnemonic == "PSTR":
-                    rd = int(parts[1][1:])
                 elif mnemonic == "CALL":
                     imm = labels[parts[1]]
                 elif mnemonic == "RET":
@@ -300,8 +310,6 @@ def translate(input_path: str, output: str = "program.bin") -> None:
                 elif mnemonic in ["CMP"]:
                     rs1 = int(parts[1][1:])
                     rs2 = int(parts[2][1:])
-                elif mnemonic == "IN":
-                    rd = int(parts[1][1:])
                 elif mnemonic in ["ADDI", "SUBI"]:
                     rd = int(parts[1][1:])
                     if len(parts) == 3:

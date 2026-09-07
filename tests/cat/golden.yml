@@ -1,16 +1,17 @@
 in_source: |-
-  IN:         .word   253
+  IN:         .word   255
   OUT:        .word   254
   STOP_WORD:  .word   10
   .start  main
   main:
       LOAD    R2,     STOP_WORD
+      LOAD    R4,     [OUT]
       JMP loop
   loop:
-      IN      R1
-      CMP     R1,     R2
+      LOAD    R3,     [IN]
+      CMP     R3,     R2
       JZ      end_program
-      STORE   R1      OUT
+      STORE   R3,     [OUT]
       JMP     loop
   end_program:
       HALT
@@ -66,255 +67,256 @@ out_log:
   - 115
   ascii: "hello world! Hello everyone\t I need more bullets"
 trace:
-- '4 - 10200002 - load r2, r0, #2 <- MEM[r0+2]'
-- 5 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 9 - 120100FE - store r1, [r0+254] -> MEM[r0+254]
-- 10 - 50000005 - jmp 5 jump 5
-- 6 - 75100000 - in r1 in r1
-- 7 - 31012000 - cmp r1, r2 compare r1, r2
-- 8 - 5100000A - jz 10 jump cond 10
-- 11 - 01000000 - HALT 01000000
-cycles: 1129
+- '3 - 10200002 - load r2, r0, #2 <- MEM[r0+2]'
+- '4 - 104000FE - load r4, r0, #254 <- MEM[r0+254]'
+- 5 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 9 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 10 - 50000006 - jmp 6 jump 6
+- '6 - 103000FF - load r3, r0, #255 <- MEM[r0+255]'
+- 7 - 31032000 - cmp r3, r2 compare r3, r2
+- 8 - 5100000B - jz 11 jump cond 11
+- 11 - 01000000 - halt
+cycles: 1184
 memory:
-- 0 253
+- 0 255
 - 1 254
 - 2 10
 - 3 0

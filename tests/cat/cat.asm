@@ -1,5 +1,5 @@
 
-IN:			.word   253
+IN:			.word   255
 OUT:		.word	254
 STOP_WORD:	.word   10
 
@@ -7,14 +7,15 @@ STOP_WORD:	.word   10
 
 main:
 	LOAD	R2,		STOP_WORD
+	LOAD	R4,		[OUT]
 	JMP loop
 
 loop:
-	IN 		R1
-	CMP		R1, 	R2
+	LOAD 	R3,		[IN]
+	CMP		R3, 	R2
 	JZ		end_program
 	
-	STORE 	R1		OUT
+	STORE 	R3,		[OUT]
 	JMP		loop
 
 end_program:

@@ -10,7 +10,7 @@ in_source: |-
   main:
       LOAD    R1,     A2
       LOAD    R2,     A1
-      LOAD    R3,     B2,
+      LOAD    R3,     B2
       LOAD    R4,     B1
       LOAD    R5,     C2
       LOAD    R6,     C1
@@ -23,32 +23,34 @@ in_source: |-
       JMP     finish_program
   set_carry:
       LOADI   R7,     1
-      JMP sum_high
+      JMP     sum_high
   finish_program:
-      STORE   R6,     OUT
-      STORE   R5,     OUT
+      STORE   R6,     [OUT]
+      STORE   R5,     [OUT]
       HALT
 out_log:
   output_buffer:
-  - 2
+  - 3
   - 0
-  ascii: "\x02\0"
+  ascii: "\x03\0"
 trace:
-- '8 - 10100002 - load r1, r0, #2 <- MEM[r0+2]'
-- '9 - 10200001 - load r2, r0, #1 <- MEM[r0+1]'
-- '10 - 10300004 - load r3, r0, #4 <- MEM[r0+4]'
-- '11 - 10400003 - load r4, r0, #3 <- MEM[r0+3]'
-- '12 - 10500006 - load r5, r0, #6 <- MEM[r0+6]'
-- '13 - 10600005 - load r6, r0, #5 <- MEM[r0+5]'
-- 14 - 20513000 - add r5, r1, r3 <- r1 + r3
-- 15 - 56000012 - JC 56000012
-- 16 - 20624000 - add r6, r2, r4 <- r2 + r4
-- 17 - 20667000 - add r6, r6, r7 <- r6 + r7
-- 18 - 50000014 - jmp 20 jump 20
-- 21 - 120600FE - store r6, [r0+254] -> MEM[r0+254]
-- 22 - 120500FE - store r5, [r0+254] -> MEM[r0+254]
-- 23 - 01000000 - HALT 01000000
-cycles: 70
+- '7 - 10100002 - load r1, r0, #2 <- MEM[r0+2]'
+- '8 - 10200001 - load r2, r0, #1 <- MEM[r0+1]'
+- '9 - 10300004 - load r3, r0, #4 <- MEM[r0+4]'
+- '10 - 10400003 - load r4, r0, #3 <- MEM[r0+3]'
+- '11 - 10500006 - load r5, r0, #6 <- MEM[r0+6]'
+- '12 - 10600005 - load r6, r0, #5 <- MEM[r0+5]'
+- 13 - 20513000 - add r5, r1, r3 <- r1 + r3
+- 14 - 56000012 - JC 56000012
+- '18 - 11700001 - loadi r7, #1'
+- 19 - 5000000F - jmp 15 jump 15
+- 15 - 20624000 - add r6, r2, r4 <- r2 + r4
+- 16 - 20667000 - add r6, r6, r7 <- r6 + r7
+- 17 - 50000014 - jmp 20 jump 20
+- 20 - 120600FE - store r6, [r0+254] -> MEM[r0+254]
+- 21 - 120500FE - store r5, [r0+254] -> MEM[r0+254]
+- 22 - 01000000 - halt
+cycles: 78
 memory:
 - 0 254
 - 1 1

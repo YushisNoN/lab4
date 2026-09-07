@@ -80,6 +80,6 @@ end_save_max_function:
 
 end_program:
 	LOAD	R1,		MAX
-	STORE 	R1, 	OUT
+	STORE 	R1, 	[OUT]
 	HALT
 	

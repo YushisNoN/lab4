@@ -1,5 +1,5 @@
 OUT:        	.word   254
-IN:         	.word   253
+IN:         	.word   255
 QUESTION:   	.str    "What is your name?\n"
 HELLO:      	.str    "Hello,  "
 NAME:			.word	0x22			; buffer
@@ -10,41 +10,44 @@ BUFFER_START:	.word 	0x22
 .start main
 
 main:
-    LOADI   R1, 	QUESTION
-    PSTR    R1
-	
-	LOADI	R1,		HELLO
-	PSTR 	R1
-	
-	
-	LOAD	R2,		NAME
-	LOADI   R4, 	10
-	LOADI	R6,		0
+	LOADI	 R4,	1
+    LOADI    R1, 	QUESTION
+	LOAD 	 R2,	R1
 
-read_loop:
-    IN      R1
-    CMP     R1, 	R4
-    JZ      finish_read
-
-    STORE   R1, 	R2
-    ADDI    R2, 	R2, 	1
-	ADDI 	R5,		1
-	
-    JMP     read_loop
-
-finish_read:
-	LOAD	R1,		BUFFER_START
-	
-	print_loop:
-		CMP		R5,		R6
-		JZ		finish_program
-	
-		LOAD	R2,		R1
-		STORE	R2,		OUT
+print_question:
+	loop:
+		CMP		R2,		R0
+		JZ		print_hello
+		ADD		R1,		R1,		R4
+		LOAD	R3,		R1
+		STORE	R3,		[OUT]
 		
-		ADDI	R1,		1
-		SUBI	R5,		1
-		JMP		print_loop
+		SUB		R2,		R2,		R4
+		JMP		loop
 
-finish_program:
+print_hello:
+	LOADI	R1,		HELLO
+	LOAD	R2,		R1
+	hello_loop:
+		CMP		R2,		R0
+		JZ		print_answer
+		ADD		R1,		R1,		R4
+		LOAD	R3,		R1
+		STORE	R3,		[OUT]
+		
+		SUB		R2,		R2,		R4
+		JMP		hello_loop
+
+print_answer:
+	LOAD	R1		[IN]
+	LOADI	R4,		10
+	answer_loop:
+		CMP		R1,		R4
+		JZ		end_program
+		STORE	R1,		[OUT]
+		ADDI	R1,		1
+		LOAD	R1		[IN]
+		JMP		answer_loop
+		
+end_program:
 	HALT

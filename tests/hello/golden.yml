@@ -1,10 +1,21 @@
 in_source: |-
-  OUT:    .word   254
-  STRING: .str    "Hello world!"
-  .start  main
+  OUT:        .word   254
+  STRING:     .str    "Hello world!"
+  .start main
   main:
+      LOADI   R4,     1
       LOADI   R1,     STRING
-      PSTR    R1
+      LOAD    R2,     R1
+      CMP     R2,     R0
+      JZ      end_program
+  loop:
+      ADD     R1,     R1,     R4
+      LOAD    R3,     R1
+      STORE   R3,     [OUT]
+      SUB     R2,     R2,     R4
+      CMP     R2,     R0
+      JNZ     loop
+  end_program:
       HALT
 out_log:
   output_buffer:
@@ -22,10 +33,85 @@ out_log:
   - 33
   ascii: Hello world!
 trace:
-- '14 - 11100001 - loadi r1, #1'
-- 15 - 74100000 - pstr r1
-- 16 - 01000000 - halt
-cycles: 11
+- '14 - 11400001 - loadi r4, #1'
+- '15 - 11100001 - loadi r1, #1'
+- '16 - 10210000 - load r2, r1, #0 <- MEM[r1+0]'
+- 17 - 31020000 - cmp r2, r0 compare r2, r0
+- 18 - 51000019 - jz 25 jump cond 25
+- 19 - 20114000 - add r1, r1, r4 <- r1 + r4
+- '20 - 10310000 - load r3, r1, #0 <- MEM[r1+0]'
+- 21 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 22 - 21224000 - sub r2, r2, r4 <- r2 - r4
+- 23 - 31020000 - cmp r2, r0 compare r2, r0
+- 24 - 52000013 - jnz 19 jump cond 19
+- 19 - 20114000 - add r1, r1, r4 <- r1 + r4
+- '20 - 10310000 - load r3, r1, #0 <- MEM[r1+0]'
+- 21 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 22 - 21224000 - sub r2, r2, r4 <- r2 - r4
+- 23 - 31020000 - cmp r2, r0 compare r2, r0
+- 24 - 52000013 - jnz 19 jump cond 19
+- 19 - 20114000 - add r1, r1, r4 <- r1 + r4
+- '20 - 10310000 - load r3, r1, #0 <- MEM[r1+0]'
+- 21 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 22 - 21224000 - sub r2, r2, r4 <- r2 - r4
+- 23 - 31020000 - cmp r2, r0 compare r2, r0
+- 24 - 52000013 - jnz 19 jump cond 19
+- 19 - 20114000 - add r1, r1, r4 <- r1 + r4
+- '20 - 10310000 - load r3, r1, #0 <- MEM[r1+0]'
+- 21 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 22 - 21224000 - sub r2, r2, r4 <- r2 - r4
+- 23 - 31020000 - cmp r2, r0 compare r2, r0
+- 24 - 52000013 - jnz 19 jump cond 19
+- 19 - 20114000 - add r1, r1, r4 <- r1 + r4
+- '20 - 10310000 - load r3, r1, #0 <- MEM[r1+0]'
+- 21 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 22 - 21224000 - sub r2, r2, r4 <- r2 - r4
+- 23 - 31020000 - cmp r2, r0 compare r2, r0
+- 24 - 52000013 - jnz 19 jump cond 19
+- 19 - 20114000 - add r1, r1, r4 <- r1 + r4
+- '20 - 10310000 - load r3, r1, #0 <- MEM[r1+0]'
+- 21 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 22 - 21224000 - sub r2, r2, r4 <- r2 - r4
+- 23 - 31020000 - cmp r2, r0 compare r2, r0
+- 24 - 52000013 - jnz 19 jump cond 19
+- 19 - 20114000 - add r1, r1, r4 <- r1 + r4
+- '20 - 10310000 - load r3, r1, #0 <- MEM[r1+0]'
+- 21 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 22 - 21224000 - sub r2, r2, r4 <- r2 - r4
+- 23 - 31020000 - cmp r2, r0 compare r2, r0
+- 24 - 52000013 - jnz 19 jump cond 19
+- 19 - 20114000 - add r1, r1, r4 <- r1 + r4
+- '20 - 10310000 - load r3, r1, #0 <- MEM[r1+0]'
+- 21 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 22 - 21224000 - sub r2, r2, r4 <- r2 - r4
+- 23 - 31020000 - cmp r2, r0 compare r2, r0
+- 24 - 52000013 - jnz 19 jump cond 19
+- 19 - 20114000 - add r1, r1, r4 <- r1 + r4
+- '20 - 10310000 - load r3, r1, #0 <- MEM[r1+0]'
+- 21 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 22 - 21224000 - sub r2, r2, r4 <- r2 - r4
+- 23 - 31020000 - cmp r2, r0 compare r2, r0
+- 24 - 52000013 - jnz 19 jump cond 19
+- 19 - 20114000 - add r1, r1, r4 <- r1 + r4
+- '20 - 10310000 - load r3, r1, #0 <- MEM[r1+0]'
+- 21 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 22 - 21224000 - sub r2, r2, r4 <- r2 - r4
+- 23 - 31020000 - cmp r2, r0 compare r2, r0
+- 24 - 52000013 - jnz 19 jump cond 19
+- 19 - 20114000 - add r1, r1, r4 <- r1 + r4
+- '20 - 10310000 - load r3, r1, #0 <- MEM[r1+0]'
+- 21 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 22 - 21224000 - sub r2, r2, r4 <- r2 - r4
+- 23 - 31020000 - cmp r2, r0 compare r2, r0
+- 24 - 52000013 - jnz 19 jump cond 19
+- 19 - 20114000 - add r1, r1, r4 <- r1 + r4
+- '20 - 10310000 - load r3, r1, #0 <- MEM[r1+0]'
+- 21 - 120300FE - store r3, [r0+254] -> MEM[r0+254]
+- 22 - 21224000 - sub r2, r2, r4 <- r2 - r4
+- 23 - 31020000 - cmp r2, r0 compare r2, r0
+- 24 - 52000013 - jnz 19 jump cond 19
+- 25 - 01000000 - halt
+cycles: 379
 memory:
 - 0 254
 - 1 12
