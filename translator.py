@@ -1,6 +1,7 @@
 import struct
 import sys
 from typing import Any
+from typing import BinaryIO, Dict, List
 
 import Opcodes
 
@@ -265,7 +266,10 @@ def translate(input_path: str, output: str = "program.bin") -> None:
                     imm = parse_value(parts[2])
                     rd = int(parts[1][1:])
                 elif mnemonic == "STORE":
-                    rs1 = int(parts[1][1:]) if (parts[1].startswith("R") or parts[1].startswith("r")) else 0
+                    if parts[1].startswith("R") or parts[1].startswith("r"):
+                        rs1 = int(parts[1][1:])
+                    else:
+                        rs1 = 0
                     arg2 = parts[2]
                     rs2 = 0
                     imm = 0

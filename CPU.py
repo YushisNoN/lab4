@@ -432,7 +432,6 @@ class CPU:
             self.PC += 1
             self.MP = 10
 
-
         elif self.MP == 10:
             opcode = (self.micro_IR >> 24) & 0xFF
             self.trace_instruction(self.trace_PC, self.IR & 0xFFFFFFFF)
@@ -558,7 +557,6 @@ class CPU:
                     val = self.get_src("rs1")
 
                 if addr == self.OUT:
-
                     self.output_buffer.append(val)
                 else:
                     self.data_mem.write(addr, val)

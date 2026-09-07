@@ -28,3 +28,7 @@ disable_error_code = ["assignment", "operator", "union-attr", "no-redef", "arg-t
 [[tool.mypy.overrides]]
 module = "main"
 disable_error_code = ["index"]
+
+[[tool.mypy.overrides]]
+module = "tests.golden_test"
+ignore_errors = true
