@@ -1,7 +1,6 @@
 import struct
 import sys
 from typing import Any
-from typing import BinaryIO, Dict, List
 
 import Opcodes
 
@@ -347,7 +346,7 @@ def translate(input_path: str, output: str = "program.bin") -> None:
         else:
             add_to_section(data_sections, addr, word)
 
-    with open(output, "wb") as f:  # type: BinaryIO
+    with open(output, "wb") as f:
         f.write(struct.pack(">I", start_address))
         # CODE_SECTION
         f.write(struct.pack(">I", len(code_sections)))
