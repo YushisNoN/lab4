@@ -22,5 +22,5 @@ jobs:
       - run: ruff check .
       - run: ruff format --check .
 
-      - run: mypy . || true
+      - run: mypy --exclude 'tests/golden_test\.py' .
       - run: PYTHONPATH=. pytest -q
